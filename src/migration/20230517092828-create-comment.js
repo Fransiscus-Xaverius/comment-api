@@ -18,6 +18,7 @@ module.exports = {
       },
       gif_reaction: {
         type: Sequelize.JSON,
+        defaultValue: [],
       },
       createdAt: {
         allowNull: false,

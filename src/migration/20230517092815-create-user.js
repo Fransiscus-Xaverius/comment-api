@@ -22,6 +22,10 @@ module.exports = {
       saldo: {
         type: Sequelize.INTEGER,
       },
+      liked_comment: {
+        type: Sequelize.JSON,
+        defaultValue: [],
+      },
     });
   },
   async down(queryInterface, Sequelize) {
