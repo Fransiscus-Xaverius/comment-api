@@ -9,11 +9,20 @@ const coba = (req, res) => {
 
 //register endpoint
 const register = async (req,res) =>{  
-  const validator = Joi.object({
-    nama: Joi.string().min(5).required().messages({
-      "any.required":"{{#label}} tidak diberikan dalam parameter",
-      "string.empty":"{{#label}} tidak boleh kosong."
-    })
+  const validator = Joi.object(
+    {
+      nama: Joi.string().min(5).required().messages(
+      {
+        "any.required":"{{#label}} tidak diberikan dalam parameter",
+        "string.empty":"{{#label}} tidak boleh kosong."
+      }
+    ),
+    email: Joi.string().email().required().messages(
+      {
+        "any.required":"{{#label}} tidak diberikan dalam parameter",
+        "string.empty":"{{#label}} tidak boleh kosong."
+      }
+    )
   })
   try{
     await validator.validateAsync(req.body);
