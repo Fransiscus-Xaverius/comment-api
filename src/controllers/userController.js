@@ -54,11 +54,13 @@ const register = async (req, res) => {
     if (userGet.length > 0) {
       return res.status(400).send({message: "Nama anda sudah digunakan"});
     }
-    let coba = await users.create({ nama: nama, email: email, password: password, api_key: apikey, api_hit: 10, saldo: 0, liked_comment: [] });
-    let temp = {
-      nama: nama,
-      api_key: apikey,
-    };
+    else {
+      let coba = await users.create({ nama: nama, email: email, password: password, api_key: apikey, api_hit: 10, saldo: 0, liked_comment: [] });
+      let temp = {
+        nama: nama,
+        api_key: apikey,
+      };
+    }
     res.status(201).send({ message: "Berhasil register", data: temp });
   } catch (error) {
     return res.send(error.toString());
@@ -78,16 +80,20 @@ const login = async (req, res) => {
     if (userGet.length == 0) {
       return res.status(404).send({message: "User tidak ditemukan"});
     }
-    if (userGet[0].password != password) {
-      return res.status(400).send({message: "Password salah"});
+    else {
+      if (userGet[0].password != password) {
+        return res.status(400).send({message: "Password salah"});
+      }
+      else {
+        let token = jwt.sign({
+          api_key: userGet[0].api_key,
+          nama: nama,
+        }, JWT_KEY, {expiresIn: '24h'})
+        return res.status(201).send({
+          token: token
+        });
+      }
     }
-    let token = jwt.sign({
-      api_key: userGet[0].api_key,
-      nama: nama,
-    }, JWT_KEY, {expiresIn: '24h'})
-    return res.status(201).send({
-      token: token
-    })
   } catch (error) {
     return res.send(error.toString());
   }
