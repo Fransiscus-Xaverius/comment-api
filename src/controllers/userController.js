@@ -65,7 +65,7 @@ const register = async (req, res) => {
   }
 };
 
-//login endpoint
+//login endpoint (silahkan di cek)
 const login = async (req, res) => {
   let { nama, password } = req.body;
   let schema = Joi.object({
