@@ -17,7 +17,11 @@ module.exports = (sequelize, DataTypes) => {
       nama: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
-      api_key: DataTypes.STRING,
+      api_key: {
+        type: DataTypes.STRING,
+        primaryKey: true,
+      },
+
       api_hit: DataTypes.INTEGER,
       saldo: DataTypes.INTEGER,
       liked_comment: {

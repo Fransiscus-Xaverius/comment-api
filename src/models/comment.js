@@ -13,7 +13,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   Comment.init(
     {
-      id_comment: DataTypes.STRING,
+      id_comment: {
+        type: DataTypes.STRING,
+        primaryKey: true,
+      },
       comment: DataTypes.STRING,
       api_key: DataTypes.STRING,
       like_count: DataTypes.INTEGER,
