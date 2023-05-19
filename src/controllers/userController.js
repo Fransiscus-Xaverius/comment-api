@@ -116,10 +116,77 @@ const topup = async (req, res) => {
   let {api_key, jumlah_api_hit} = req.body;
 };
 
+//Top up saldo endpoint
+const topupSaldo = async (req, res) => {
+  let {nominal} = req.body;
+  let token = req.header("x-auth-token");
+  let schema = Joi.object({
+    nominal: Joi.number().integer().min(1000).required()
+  });
+  try {
+    let res = await schema.validateAsync(req.body);
+  }catch(error){
+    return res.status(400).send(error.toString());
+  }
+  try {
+    let temp = jwt.verify(token, JWT_KEY);
+    let user = await users.findAll({
+      where:{
+        nama: temp.nama
+      }
+    });
+    if(user.length > 0){
+      let saldoAwal = parseInt(user[0].saldo);
+      let saldoAkhir = saldoAwal + parseInt(nominal);
+      await users.update({
+        saldo: saldoAkhir
+      },{
+        where:{
+          nama: temp.nama
+        }
+      }); 
+      return res.status(200).send({
+        message: "Berhasil Topup sebesar Rp "+nominal,
+        saldo: "Rp "+saldoAkhir
+      });
+    }else{
+      return res.status(400).send({"message": "Invalid token"});
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({"message": "Invalid token"});
+  }
+};
+
 //Top up API Hit endpoint
 
+
+
+
 //Cek Saldo endpoint
+const cekSaldo = async (req, res) => {
+  let token = req.header("x-auth-token");
+  try {
+    let temp = jwt.verify(token, JWT_KEY);
+    let user = await users.findAll({
+      where:{
+        nama: temp.nama
+      }
+    });
+    if(user.length > 0){
+      let saldo = parseInt(user[0].saldo);
+      return res.status(200).send({
+        message: "Saldo saat ini sebesar Rp "+saldo
+      });
+    }else{
+      return res.status(400).send({"message": "Invalid token"});
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({"message": "Invalid token"});
+  }
+};
 
 //Cek API Hit endpoint
 
-module.exports = { coba, register, login };
+module.exports = { coba, register, login, topupSaldo, cekSaldo };
