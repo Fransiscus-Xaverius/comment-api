@@ -75,7 +75,7 @@ const register = async (req, res) => {
       return res.status(201).send({ message: "Berhasil register", data: temp });
     }
   } catch (error) {
-    return res.send(error.toString());
+    return res.status(400).send(error.toString());
   }
 };
 
@@ -107,12 +107,13 @@ const login = async (req, res) => {
       }
     }
   } catch (error) {
-    return res.send(error.toString());
+    return res.status(400).send(error.toString());
   }
   
 };
 
-const topup = async (req, res) => {
+//Top up API Hit endpoint
+const topupApiHit = async (req, res) => {
   let {api_key, jumlah_api_hit} = req.body;
 };
 
@@ -153,15 +154,9 @@ const topupSaldo = async (req, res) => {
       return res.status(400).send({"message": "Invalid token"});
     }
   } catch (error) {
-    console.log(error);
     return res.status(400).send({"message": "Invalid token"});
   }
 };
-
-//Top up API Hit endpoint
-
-
-
 
 //Cek Saldo endpoint
 const cekSaldo = async (req, res) => {
@@ -182,11 +177,32 @@ const cekSaldo = async (req, res) => {
       return res.status(400).send({"message": "Invalid token"});
     }
   } catch (error) {
-    console.log(error);
     return res.status(400).send({"message": "Invalid token"});
   }
 };
 
 //Cek API Hit endpoint
+const cekApiHit = async (req, res) => {
+  let token = req.header("x-auth-token");
+  try {
+    let temp = jwt.verify(token, JWT_KEY);
+    let user = await users.findAll({
+      where:{
+        nama: temp.nama
+      }
+    });
+    if(user.length > 0){
+      let api_hit = parseInt(user[0].api_hit);
+      return res.status(200).send({
+        nama: user[0].nama,
+        api_hit: api_hit
+      });
+    }else{
+      return res.status(400).send({"message": "Invalid token"});
+    }
+  } catch (error) {
+    return res.status(400).send({"message": "Invalid token"});
+  }
+};
 
-module.exports = { coba, register, login, topupSaldo, cekSaldo };
+module.exports = { coba, register, login, topupSaldo, cekSaldo, cekApiHit };
