@@ -22,7 +22,7 @@ function generateString(length) {
   return result;
 }
 
-async function userGet(nama) {
+async function getUser(nama) {
   let userGet = await users.findAll({
     where:{
       nama: nama
@@ -44,13 +44,13 @@ const register = async (req, res) => {
     nama: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
-    confirm_password: Joi.string().equal(Joi.ref("password")),
+    confirm_password: Joi.string().equal(Joi.ref("password")).required(),
   });
   try {
     let res1 = await schema.validateAsync(req.body);
     //generate api key random untuk primary key user
     let apikey = generateString(10); //generate 10 random alphanum string
-    let userGet = userGet(nama);
+    let userGet = await getUser(nama);
     if (userGet.length > 0) {
       return res.status(400).send({message: "Nama anda sudah digunakan"});
     }
@@ -60,8 +60,8 @@ const register = async (req, res) => {
         nama: nama,
         api_key: apikey,
       };
+      return res.status(201).send({ message: "Berhasil register", data: temp });
     }
-    res.status(201).send({ message: "Berhasil register", data: temp });
   } catch (error) {
     return res.send(error.toString());
   }
@@ -76,7 +76,7 @@ const login = async (req, res) => {
   });
   try {
     let res1 = await schema.validateAsync(req.body);
-    let userGet = userGet(nama);
+    let userGet = await getUser(nama);
     if (userGet.length == 0) {
       return res.status(404).send({message: "User tidak ditemukan"});
     }
