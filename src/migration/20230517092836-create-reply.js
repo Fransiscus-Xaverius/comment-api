@@ -10,6 +10,10 @@ module.exports = {
       id_comment: {
         type: Sequelize.STRING,
       },
+      username:{
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       api_key: {
         type: Sequelize.STRING,
       },

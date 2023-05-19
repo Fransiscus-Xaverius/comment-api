@@ -48,8 +48,20 @@ const register = async (req, res) => {
   });
   try {
     let res1 = await schema.validateAsync(req.body);
-    //generate api key random untuk primary key user
-    let apikey = generateString(10); //generate 10 random alphanum string
+    let apikey, kembar;
+    do {
+      //generate api key random untuk primary key user
+      apikey = generateString(10); //generate 10 random alphanum string
+      //cek apikey yang digenerate tidak kembar
+      kembar = false;
+      let allUser = await users.findAll();
+      for (let i = 0; i < allUser.length; i++) {
+        if(allUser[i].api_key == apikey){
+          kembar = true;
+        }
+      }
+    } while (kembar);
+    
     let userGet = await getUser(nama);
     if (userGet.length > 0) {
       return res.status(400).send({message: "Nama anda sudah digunakan"});
