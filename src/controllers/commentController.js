@@ -1,11 +1,12 @@
+require("dotenv").config();
 const { Sequelize, DataTypes } = require("sequelize");
-require('dotenv').config();
 const sequelize = new Sequelize("db_proyekws", "root", "", {
-    host: "localhost",
-    port: 3306,
-    dialect: "mysql",
+  host: "localhost",
+  port: 3306,
+  dialect: "mysql",
 });
 const Joi = require("joi");
+const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const JWT_KEY = process.env.JWT_KEY;
 const axios = require("axios");
@@ -13,11 +14,13 @@ const axios = require("axios");
 //models
 const comments = require("../models/comment")(sequelize, DataTypes);
 
+//get Comment count
 async function getCommentCount(){
     const count = await comments.count();
     return count;
 }
 
+//generate comment ID
 async function generateCommentID(){
     let id = "C";
     let count = await getCommentCount();

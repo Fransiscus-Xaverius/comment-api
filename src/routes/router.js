@@ -3,6 +3,7 @@ const router = require("express").Router();
 //user endpoints
 const { register, coba, login, topupSaldo, cekSaldo, cekApiHit } = require("../controllers/userController");
 
+//users
 router.post("/user/register", register);
 router.post("/user/login", login);
 router.post("/user/topup_saldo", topupSaldo);

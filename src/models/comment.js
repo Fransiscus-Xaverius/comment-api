@@ -17,9 +17,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         primaryKey: true,
       },
-      username:{
+      username: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       comment: DataTypes.STRING,
       api_key: DataTypes.STRING,
