@@ -9,7 +9,6 @@ const Joi = require("joi");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const JWT_KEY = process.env.JWT_KEY;
-const axios = require("axios");
 
 //models
 const comments = require("../models/comment")(sequelize, DataTypes);
@@ -34,7 +33,6 @@ async function generateCommentID(){
 }
 
 const addComment = async (req,res)=>{
-    console.log("masuk");
     let token = req.header('x-auth-token');
     if(token){
         let userdata = ""
@@ -99,4 +97,8 @@ const addComment = async (req,res)=>{
     }
 }
 
-module.exports = {addComment};
+const editComment = async (req,res)=>{
+    
+}
+
+module.exports = {addComment, editComment};

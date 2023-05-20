@@ -28,11 +28,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         defaultValue: [],
       },
+      updatedAt: DataTypes.DATE,
     },
     {
       sequelize,
       modelName: "Comment",
-      updatedAt: false
+      timestamps:true,
     }
   );
   return Comment;
