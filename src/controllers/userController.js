@@ -1,4 +1,5 @@
 const { Sequelize, DataTypes } = require("sequelize");
+require("dotenv").config();
 const sequelize = new Sequelize("db_proyekws", "root", "", {
   host: "localhost",
   port: 3306,
@@ -6,7 +7,7 @@ const sequelize = new Sequelize("db_proyekws", "root", "", {
 });
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
-const JWT_KEY = 'PROJEK_WS';
+const JWT_KEY = process.env.JWT_KEY;
 //ambil model
 const users = require("../models/user")(sequelize, DataTypes);
 //helper function
@@ -40,7 +41,7 @@ const coba = (req, res) => {
   return res.status(200).send("Test");
 };
 
-//register endpoint (DONE)
+//register endpoint 
 const register = async (req, res) => {
   let { nama, email, password, confirm_password } = req.body;
   //cek format email, password & conf dengan joi
@@ -95,7 +96,7 @@ const register = async (req, res) => {
   }
 };
 
-//login endpoint (silahkan di cek)
+//login endpoint 
 const login = async (req, res) => {
   let { nama, password } = req.body;
   let schema = Joi.object({
@@ -136,7 +137,7 @@ const login = async (req, res) => {
 
 //Top up API Hit endpoint
 const topupApiHit = async (req, res) => {
-  let {api_key, jumlah_api_hit} = req.body;
+  
 };
 
 //Top up saldo endpoint
