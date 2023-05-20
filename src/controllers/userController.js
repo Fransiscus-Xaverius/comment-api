@@ -32,6 +32,10 @@ async function getUser(nama) {
   return userGet;
 }
 
+async function userGetByKey(key){
+  
+}
+
 const coba = (req, res) => {
   return res.status(200).send("Test");
 };
@@ -41,10 +45,22 @@ const register = async (req, res) => {
   let { nama, email, password, confirm_password } = req.body;
   //cek format email, password & conf dengan joi
   let schema = Joi.object({
-    nama: Joi.string().required(),
-    email: Joi.string().email().required(),
-    password: Joi.string().min(8).required(),
-    confirm_password: Joi.string().equal(Joi.ref("password")).required(),
+    nama: Joi.string().required().messages({
+      "any.required": "{{#label}} harus diisi",
+      "string.empty": "{{#label}} tidak boleh blank",
+    }),
+    email: Joi.string().email().required().messages({
+      "any.required": "{{#label}} harus diisi",
+      "string.empty": "{{#label}} tidak boleh blank",
+    }),
+    password: Joi.string().min(8).required().messages({
+      "any.required": "{{#label}} harus diisi",
+      "string.empty": "{{#label}} tidak boleh blank",
+    }),
+    confirm_password: Joi.string().equal(Joi.ref("password")).messages({
+      "any.required": "{{#label}} harus diisi",
+      "string.empty": "{{#label}} tidak boleh blank",
+    })
   });
   try {
     let res1 = await schema.validateAsync(req.body);
@@ -75,7 +91,7 @@ const register = async (req, res) => {
       return res.status(201).send({ message: "Berhasil register", data: temp });
     }
   } catch (error) {
-    return res.status(400).send(error.toString());
+    return res.status(400).send(error.message);
   }
 };
 
@@ -83,8 +99,14 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   let { nama, password } = req.body;
   let schema = Joi.object({
-    nama: Joi.string().required(),
-    password: Joi.string().required(),
+    nama: Joi.string().required().messages({
+      "any.required": "{{#label}} harus diisi",
+      "string.empty": "{{#label}} tidak boleh blank",
+    }),
+    password: Joi.string().required().messages({
+      "any.required": "{{#label}} harus diisi",
+      "string.empty": "{{#label}} tidak boleh blank",
+    })
   });
   try {
     let res1 = await schema.validateAsync(req.body);
