@@ -67,8 +67,10 @@ const addComment = async (req, res) => {
   let token = req.header("x-auth-token");
   if (token) {
     let userdata = "";
+    let cariUser;
     try {
       userdata = jwt.verify(token, JWT_KEY);
+      cariUser = await users.findOne({ where: { nama: userdata.nama } });
     } catch (error) {
       return res.status(403).send("Unauthorized Token.");
     }
@@ -91,7 +93,7 @@ const addComment = async (req, res) => {
       let result = await axios.request(config);
       if (result) {
         let id = await generateCommentID();
-        await comments.create({ id_comment: id, username: username, comment: result.data.clean, like_count: 0 });
+        await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: cariUser.api_key, like_count: 0 });
 
         let temp = {
           username: username,
