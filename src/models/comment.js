@@ -32,7 +32,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Comment",
-      updatedAt: false
     }
   );
   return Comment;
