@@ -15,7 +15,7 @@ router.get("/user/api_hit", cekApiHit);
 const { addComment, editComment, addReply } = require("../controllers/commentController");
 
 router.post("/comment/add", addComment);
-router.post("/comment/edit", editComment);
+router.put("/comment/edit", editComment);
 
 //reply endpoints
 router.post("/reply/add", addReply);

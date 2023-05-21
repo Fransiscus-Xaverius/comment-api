@@ -219,4 +219,7 @@ const addReply = async (req, res) => {
     }
   } else res.status(400).send({ message: "Token nowhere to be found.." });
 };
-module.exports = { addComment, editComment, addReply };
+
+//edit reply endpoint
+const editReply = async (req, res) => {};
+module.exports = { addComment, editComment, addReply, editReply };
