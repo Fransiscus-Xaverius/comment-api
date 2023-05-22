@@ -8,7 +8,6 @@ const sequelize = new Sequelize("db_proyekws", "root", "", {
 const Joi = require("joi");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
-const comment = require("../models/comment");
 const JWT_KEY = process.env.JWT_KEY;
 
 //models
@@ -78,6 +77,10 @@ const addComment = async (req, res) => {
     let username = userdata.nama;
 
     let schema = Joi.object({
+      id_post: Joi.string().required().messages({
+        "any.required": "{{#label}} harus diisi",
+        "string.empty": "{{#label}} tidak boleh blank",
+      }),
       comment: Joi.string().required().messages({
         "any.required": "{{#label}} harus diisi",
         "string.empty": "{{#label}} tidak boleh blank",
