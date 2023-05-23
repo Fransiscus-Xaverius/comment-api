@@ -36,9 +36,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      id_post: {
-        type: Sequelize.STRING,
-      },
     });
   },
   async down(queryInterface, Sequelize) {
