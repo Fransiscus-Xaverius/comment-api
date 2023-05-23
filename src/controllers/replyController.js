@@ -14,6 +14,7 @@ const JWT_KEY = process.env.JWT_KEY;
 const comments = require("../models/comment")(sequelize, DataTypes);
 const replies = require("../models/reply")(sequelize, DataTypes);
 const users = require("../models/user")(sequelize, DataTypes);
+const likes = require("../models/like")(sequelize, DataTypes);
 
 //helper function
 async function commentExists(id) {
@@ -152,6 +153,9 @@ const deleteReply = async (req, res) => {
         let cek = await replies.findOne({ where: { id_reply: id_reply } });
         if (cek) {
           await replies.update({ status: 0 }, { where: { id_reply: id_reply } });
+          //remove like related to that reply (0 comment 1 reply)
+          //if like type==1, id_comment==id_reply
+          await likes.destroy({ where: { jenis: 1, id_comment: id_reply } });
           return res.status(200).send({ message: "Reply successfully deleted" });
         } else res.status(404).send({ message: "Reply not found" });
       } catch (error) {
@@ -181,7 +185,9 @@ const deleteAllReply = async (req, res) => {
         let cek = await commentExists(id_comment);
         if (cek) {
           await replies.update({ status: 0 }, { where: { id_comment: id_comment } });
-          return res.status(201).send({ message: "All replies of this comment successfully deleted!" });
+          //remove all likes related to those replies (0= comment 1=reply) (UNDONE)
+          //   await likes.destroy({ where: { jenis:1, id_comment:   } });
+          return res.status(201).send({ message: "All replies of this comment are successfully deleted!" });
         } else return res.status(404).send({ message: "Comment not found" });
       } catch (error) {
         res.status(400).send(error.message);
@@ -191,4 +197,44 @@ const deleteAllReply = async (req, res) => {
     }
   } else res.status(400).send({ message: "Token is nowhere to be found" });
 };
-module.exports = { addReply, editReply, deleteReply, deleteAllReply };
+
+//like reply endpoint
+const likeReply = async (req, res) => {
+  let token = req.header("x-auth-token");
+  let { id_reply } = req.body;
+  if (token) {
+    try {
+      let userData = jwt.verify(token, JWT_KEY);
+      let cariUser = await users.findOne({ where: { nama: userData.nama } });
+      let schema = Joi.object({
+        id_reply: Joi.string().required().messages({
+          "any.required": "{{#label}} harus diisi",
+          "string.empty": "{{#label}} tidak boleh blank",
+        }),
+      });
+      try {
+        await schema.validateAsync(req.body);
+        //check id reply exist or not
+        let cari = await replies.findOne({ where: { id_reply: id_reply, status: 1 } });
+        if (cari) {
+          //check if user has already liked this reply
+          let sudahLike = await likes.findOne({ where: { jenis: 1, username: cariUser.nama, id_comment: id_reply } });
+          if (!sudahLike) {
+            let id;
+            let hitung = await likes.findAll();
+            if (hitung.length > 0) {
+              id = "L" + (parseInt(hitung[hitung.length - 1].dataValues.id_like.substring(1)) + 1);
+            } else id = "L1";
+            await likes.create({ id_like: id, id_comment: id_reply, id_post: null, username: cariUser.nama, jenis: 1 });
+            res.status(201).send({ message: "Successfully liked this reply" });
+          } else res.status(400).send({ message: "User has already liked this reply" });
+        } else res.status(404).send({ message: "Reply not found" });
+      } catch (error) {
+        res.status(400).send(error.message);
+      }
+    } catch (error) {
+      res.status(400).send({ message: "Something is wrong with the token" });
+    }
+  } else res.status(400).send({ message: "Token is nowhere to be found" });
+};
+module.exports = { addReply, editReply, deleteReply, deleteAllReply, likeReply };

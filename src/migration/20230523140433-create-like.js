@@ -1,28 +1,28 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('likes', {
+    await queryInterface.createTable("likes", {
       id_like: {
         primaryKey: true,
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       id_comment: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       id_post: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       username: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
-      jenis:{
-        type: Sequelize.STRING
-      }
+      jenis: {
+        type: Sequelize.INTEGER,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('likes');
-  }
+    await queryInterface.dropTable("likes");
+  },
 };
