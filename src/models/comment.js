@@ -32,7 +32,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         defaultValue: [],
       },
-      id_post: DataTypes.STRING,
     },
     {
       sequelize,
