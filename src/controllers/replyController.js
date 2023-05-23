@@ -163,4 +163,32 @@ const deleteReply = async (req, res) => {
   } else return res.status(400).send({ message: "Token is missing.." });
 };
 
-module.exports = { addReply, editReply, deleteReply };
+//delete all reply in a specified comment
+const deleteAllReply = async (req, res) => {
+  let token = req.header("x-auth-token");
+  let { id_comment } = req.body;
+  if (token) {
+    try {
+      let userData = jwt.verify(token, JWT_KEY);
+      let schema = Joi.object({
+        id_comment: Joi.string().required().messages({
+          "any.required": "{{#label}} harus diisi",
+          "string.empty": "{{#label}} tidak boleh blank",
+        }),
+      });
+      try {
+        await schema.validateAsync(req.body);
+        let cek = await commentExists(id_comment);
+        if (cek) {
+          await replies.update({ status: 0 }, { where: { id_comment: id_comment } });
+          return res.status(201).send({ message: "All replies of this comment successfully deleted!" });
+        } else return res.status(404).send({ message: "Comment not found" });
+      } catch (error) {
+        res.status(400).send(error.message);
+      }
+    } catch (error) {
+      res.status(400).send({ message: "Something is wrong with the token" });
+    }
+  } else res.status(400).send({ message: "Token is nowhere to be found" });
+};
+module.exports = { addReply, editReply, deleteReply, deleteAllReply };
