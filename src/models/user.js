@@ -24,10 +24,6 @@ module.exports = (sequelize, DataTypes) => {
 
       api_hit: DataTypes.INTEGER,
       saldo: DataTypes.INTEGER,
-      liked_comment: {
-        type: DataTypes.JSON,
-        defaultValue: [],
-      },
     },
     {
       sequelize,

@@ -168,7 +168,7 @@ const topupApiHit = async (req, res) => {
     jumlah_api_hit: Joi.number().integer().min(1).required().messages({
       "any.required": "{{#label}} harus diisi",
       "string.empty": "{{#label}} tidak boleh blank",
-      "number.min": "{{#label}} jumlah topup minimal 1",
+      "number.min": "{{#label}} minimal 1",
     }),
   });
 
@@ -219,7 +219,7 @@ const topupSaldo = async (req, res) => {
     nominal: Joi.number().integer().min(1000).required().messages({
       "any.required": "{{#label}} harus diisi",
       "string.empty": "{{#label}} tidak boleh blank",
-      "number.min": "{{#label}} jumlah topup minimal 1000",
+      "number.min": "{{#label}} topup minimal 1000",
     }),
   });
   try {

@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         defaultValue: [],
       },
+      status:{
+        type: DataTypes.INTEGER,
+        defaultValue: 1,
+      }
     },
     {
       sequelize,
