@@ -18,17 +18,22 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
       },
       id_comment: DataTypes.STRING,
-      username:{
+      username: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
       },
       api_key: DataTypes.STRING,
       reply: DataTypes.STRING,
+      like_count: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
     },
     {
       sequelize,
       modelName: "Reply",
-      timestamps: false,
+      updatedAt: true,
+      createdAt: false,
     }
   );
   return Reply;

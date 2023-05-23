@@ -5,9 +5,10 @@ const sequelize = new Sequelize("db_proyekws", "root", "", {
   port: 3306,
   dialect: "mysql",
 });
-
+const jwt = require("jsonwebtoken");
 //models
-const posts = require("../models/post");
+const posts = require("../models/post")(sequelize, DataTypes);
+const users = require("../models/user")(sequelize, DataTypes);
 
 //generate new post functions
 
@@ -27,12 +28,13 @@ async function getPostCount() {
   const count = await posts.count();
   return count;
 }
+const JWT_KEY = process.env.JWT_KEY;
 
 //add post endpoint (Unchecked)
-const addPost = async (req,res)=>{
-  console.log("masuk");
+const addPost = async (req, res) => {
+  // console.log(JWT_KEY);
   let token = req.header("x-auth-token");
-  if(token){
+  if (token) {
     let userdata = "";
     let cariUser;
 
@@ -42,35 +44,31 @@ const addPost = async (req,res)=>{
       userdata = jwt.verify(token, JWT_KEY);
       cariUser = await users.findOne({ where: { nama: userdata.nama } });
     } catch (error) {
-      return res.status(403).send("Unauthorized Token.");
+      // return res.status(403).send("Unauthorized Token.");
+      return res.send(error.toString());
     }
 
     //if current user exists, make post and return id_post
 
-    if(cariUser){
+    if (cariUser) {
       //generate post ID
       let id = await generatePostID();
       //create new post with ORM
-      await posts.create({id_post : id});
-      
-      return res.status(201).send({message:"New Post successfully added", id_post:id});
+      await posts.create({ id_post: id, api_key: cariUser.api_key });
 
-    }
-    else{
+      return res.status(201).send({ message: "New Post successfully added", id_post: id });
+    } else {
       //Unreachable statement, but here just in case a user is deleted but the token is still active.
-      return res.status(400).send({message:"User not registered"})
+      return res.status(400).send({ message: "User not registered" });
     }
-
-  }
-  else res.status(400).send({ message: "Token is required but not found." });
-}
+  } else res.status(400).send({ message: "Token is required but not found." });
+};
 
 //get all post from user (Unchecked)
-const getAllPost = async (req,res) =>{
+const getAllPost = async (req, res) => {
   let token = req.header("x-auth-token");
-  if(token){
-
+  if (token) {
   }
-}
+};
 
-module.exports = {addPost, getAllPost}
+module.exports = { addPost, getAllPost };

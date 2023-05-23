@@ -91,12 +91,12 @@ const addComment = async (req, res) => {
       await schema.validateAsync(req.body);
 
       let comment = req.body.comment;
-
+      let id_post = req.body.id_post;
       const config = await profanityFilter(comment);
       let result = await axios.request(config);
       if (result) {
         let id = await generateCommentID();
-        await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: cariUser.api_key, like_count: 0 });
+        await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: cariUser.api_key, like_count: 0, id_post: id_post });
 
         let temp = {
           username: username,
@@ -220,9 +220,48 @@ const addReply = async (req, res) => {
     } catch (error) {
       return res.status(400).send({ msg: "Something is wrong with the token" });
     }
-  } else res.status(400).send({ message: "Token nowhere to be found.." });
+  } else res.status(400).send({ message: "Token is nowhere to be found.." });
 };
 
-//edit reply endpoint
-const editReply = async (req, res) => {};
+//edit reply endpoint (DONE)
+const editReply = async (req, res) => {
+  let { id_reply, new_reply } = req.body;
+  let token = req.header("x-auth-token");
+  if (token) {
+    try {
+      let userData = jwt.verify(token, JWT_KEY);
+      //check whether the reply id exist or not
+      let cariReply = await replies.findOne({ where: { id_reply: id_reply } });
+      if (cariReply) {
+        //joi validation
+        let schema = Joi.object({
+          id_reply: Joi.string().required().messages({
+            "any.required": "{{#label}} harus diisi",
+            "string.empty": "{{#label}} tidak boleh blank",
+          }),
+          new_reply: Joi.string().required().messages({
+            "any.required": "{{#label}} harus diisi",
+            "string.empty": "{{#label}} tidak boleh blank",
+          }),
+        });
+        try {
+          await schema.validateAsync(req.body);
+          //censor any offensive words
+          const config = await profanityFilter(new_reply);
+          let result = await axios.request(config);
+          if (!result) return res.status(400).send({ msg: "Something went wrong! please try again later. ERR CODE 001" });
+          else {
+            //update reply
+            await replies.update({ reply: result.data.clean }, { where: { id_reply: id_reply } });
+            res.status(201).send({ message: "Reply successfully updated" });
+          }
+        } catch (error) {
+          return res.status(400).send(error.message);
+        }
+      } else return res.status(404).send({ message: "Reply not found" });
+    } catch (error) {
+      return res.status(400).send({ message: "Something is wrong with the token" });
+    }
+  } else return res.status(403).send({ message: "Token is nowhere to be found..." });
+};
 module.exports = { addComment, editComment, addReply, editReply };
