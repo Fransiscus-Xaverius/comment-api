@@ -15,12 +15,21 @@ const comments = require("../models/comment")(sequelize, DataTypes);
 const replies = require("../models/reply")(sequelize, DataTypes);
 const users = require("../models/user")(sequelize, DataTypes);
 
+//module imports
+const { isUserPost } = require("../controllers/postController");
+
 //get Comment count
 async function getCommentCount() {
   const count = await comments.count();
   return count;
 }
 
+//get comment by ID
+async function getComment(id){
+  return comments.findOne({where: {id_comment:id}});
+}
+
+//check if comment exists
 async function commentExists(id) {
   return comments.count({ where: { id_comment: id } }).then((count) => {
     if (count != 0) {
@@ -75,7 +84,7 @@ const addComment = async (req, res) => {
     }
 
     let username = userdata.nama;
-
+    let api_key = userdata.api_key;
     let schema = Joi.object({
       id_post: Joi.string().required().messages({
         "any.required": "{{#label}} harus diisi",
@@ -87,32 +96,37 @@ const addComment = async (req, res) => {
       }),
     });
 
+    //validate body params
     try {
       await schema.validateAsync(req.body);
-
-      let comment = req.body.comment;
-      let id_post = req.body.id_post;
-      const config = await profanityFilter(comment);
-      let result = await axios.request(config);
-      if (result) {
-        let id = await generateCommentID();
-        await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: cariUser.api_key, like_count: 0, id_post: id_post });
-
-        let temp = {
-          username: username,
-          id_comment: id,
-          comment: result.data.clean,
-        };
-
-        return res.status(201).send({ message: " Berhasil menambahkan komentar", data: temp });
-      } else {
-        return res.status(400).send({ msg: "Something went wrong! please try again later. ERR CODE 001" });
-      }
     } catch (error) {
       return res.status(400).send({
         error_message: error.message,
       });
     }
+
+    let comment = req.body.comment;
+    let id_post = req.body.id_post;
+    let isuserpost = await isUserPost(api_key, id_post);
+    console.log(api_key);
+    if(!isuserpost) return res.status(400).send({message:"Unauthorized Access. This post belongs to another user."});
+    const config = await profanityFilter(comment);
+    let result = await axios.request(config);
+    if (result) {
+      let id = await generateCommentID();
+      await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: cariUser.api_key, like_count: 0, id_post: id_post });
+
+      let temp = {
+        username: username,
+        id_comment: id,
+        comment: result.data.clean,
+      };
+
+      return res.status(201).send({ message: " Berhasil menambahkan komentar", data: temp });
+    } else {
+      return res.status(400).send({ msg: "Something went wrong! please try again later. ERR CODE 001" });
+    }
+
   } else {
     return res.status(400).send({ msg: "Token is required but not found." });
   }
@@ -130,6 +144,7 @@ const editComment = async (req, res) => {
     }
 
     let username = userdata.nama;
+    let api_key = userdata.api_key;
     let schema = Joi.object({
       id_comment: Joi.string().required().messages({
         "any.required": "{{#label}} harus diisi",
@@ -143,35 +158,55 @@ const editComment = async (req, res) => {
 
     try {
       await schema.validateAsync(req.body);
-      let id = req.body.id_comment;
-      let new_comment = req.body.new_comment;
-      let existed = await commentExists(id);
-      if (!existed) return res.status(404).send({ message: "Comment doesn't exists." });
-
-      const config = await profanityFilter(new_comment);
-      let result = await axios.request(config);
-
-      if (!result) return res.status(400).send({ msg: "Something went wrong! please try again later. ERR CODE 001" });
-
-      await comments.update(
-        {
-          comment: result.data.clean,
-        },
-        {
-          where: { id_comment: id },
-        }
-      );
-      let data = {
-        id: id,
-        new_comment: result.data.clean,
-      };
-      return res.status(200).send({ message: "Berhasil update comment", data: data });
     } catch (error) {
       return res.status(400).send({ error_message: error.message });
     }
-  } else {
-    return res.status(400).send({ message: "Token is required but not found." });
-  }
+    let id = req.body.id_comment;
+    let new_comment = req.body.new_comment;
+    let existed = await commentExists(id);
+    if (!existed) return res.status(404).send({ message: "Comment doesn't exists." });
+
+    let oldComment = await getComment(id);
+    if(oldComment.api_key!=api_key) return res.status(400).send({message:"Unauthorized Token. Comment belongs to another user."});
+    
+    const config = await profanityFilter(new_comment);
+    let result = await axios.request(config);
+
+    if (!result) return res.status(400).send({ msg: "Something went wrong! please try again later. ERR CODE 001" });
+
+    await comments.update(
+      {
+        comment: result.data.clean,
+      },
+      {
+        where: { id_comment: id },
+      }
+    );
+    let data = {
+      id: id,
+      new_comment: result.data.clean,
+    };
+    return res.status(200).send({ message: "Berhasil update comment", data: data });
+  } 
+  return res.status(400).send({ message: "Token is required but not found." });
 };
 
-module.exports = { addComment, editComment };
+//get all comments from post endpoint
+const getAllComments = async(req,res)=>{
+  let token = req.header("x-auth-token");
+  if(token){
+    let userdata = "";
+    try {
+      userdata = jwt.verify(token, JWT_KEY);
+    } catch (error) {
+      return res.status(403).send("Unauthorized Token.");
+    }
+    
+
+  }
+  return res.status(400).send({ message: "Token is required but not found." });
+}
+
+
+
+module.exports = { addComment, editComment, getAllComments,  };

@@ -32,6 +32,16 @@ async function getPostCount() {
   return count;
 }
 
+async function getPost(id_post){
+  let tarPost = await posts.findOne({where:{id_post:id_post}, raw:true});
+  return tarPost.api_key;
+}
+
+async function isUserPost(api_key, id_post){
+  let fuckthisshit = await getPost(id_post);
+  return fuckthisshit==api_key
+}
+
 //add post endpoint (Unchecked)
 const addPost = async (req, res) => {
   // console.log(JWT_KEY);
@@ -112,4 +122,4 @@ const getAllPost = async (req, res) => {
   else res.status(400).send({ message: "Token is required but not found."});
 }
 
-module.exports = { addPost, getAllPost };
+module.exports = { addPost, getAllPost , isUserPost};
