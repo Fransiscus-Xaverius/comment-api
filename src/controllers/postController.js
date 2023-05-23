@@ -61,8 +61,6 @@ const addPost = async (req, res) => {
       let curHit = await hit_api(api_key, 3);
 
       return res.status(201).send({message:"New Post successfully added", id_post:id, API_HIT : curHit});
-
-      return res.status(201).send({ message: "New Post successfully added", id_post: id });
     } else {
       //Unreachable statement, but here just in case a user is deleted but the token is still active.
       return res.status(400).send({ message: "User not registered" });
@@ -82,7 +80,33 @@ const getAllPost = async (req, res) => {
     //Search for current user who's registering a new post.
     cariUser = await users.findOne({ where: { nama: userdata.nama } });
 
+    let allPosts = await posts.findAll({
+      where: {
+        api_key: cariUser.api_key
+      }
+    })
+
+    let foo = [];
     
+    
+
+    if(allPosts){
+      for (let index = 0; index < allPosts.length; index++) {
+        const element = allPosts[index];
+        foo.push(element.id_post);
+      }
+      return res.status(200).send({
+        username:cariUser.username,
+        api_key: cariUser.api_key,
+        Posts : foo
+      })
+    }
+    //safeguard incase of database error/deleted user with valid token
+    return res.status(400).send(
+      {
+        message:"Oops, something went wrong."
+      }
+    )
 
   }
   else res.status(400).send({ message: "Token is required but not found."});
