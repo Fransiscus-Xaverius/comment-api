@@ -13,11 +13,15 @@ router.get("/user/api_hit", cekApiHit);
 
 //comment endpoints
 const { addComment, editComment, addReply } = require("../controllers/commentController");
+const { addPost } = require("../controllers/postController");
 
 router.post("/comment/add", addComment);
 router.put("/comment/edit", editComment);
 
 //reply endpoints
 router.post("/reply/add", addReply);
+
+//posts endpoints
+router.post("/post/add", addPost);
 
 module.exports = router;

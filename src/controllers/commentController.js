@@ -170,7 +170,7 @@ const editComment = async (req, res) => {
       return res.status(400).send({ error_message: error.message });
     }
   } else {
-    return res.status(400).send({ msg: "Token is required but not found." });
+    return res.status(400).send({ message: "Token is required but not found." });
   }
 };
 
