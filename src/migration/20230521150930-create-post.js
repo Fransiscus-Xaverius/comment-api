@@ -7,6 +7,9 @@ module.exports = {
         type: Sequelize.STRING,
         primaryKey: true,
       },
+      api_key: {
+        type: Sequelize.STRING,
+      },
     });
   },
   async down(queryInterface, Sequelize) {

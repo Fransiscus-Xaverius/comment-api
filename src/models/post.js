@@ -17,6 +17,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         primaryKey: true,
       },
+      api_key: {
+        type: DataTypes.STRING,
+      },
     },
     {
       sequelize,
