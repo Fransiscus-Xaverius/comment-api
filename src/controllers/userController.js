@@ -139,7 +139,11 @@ const topupApiHit = async (req, res) => {
   let token = req.header("x-auth-token");
   let { jumlah_api_hit } = req.body;
   let schema = Joi.object({
-    jumlah_api_hit: Joi.number().integer().min(1).required(),
+    jumlah_api_hit: Joi.number().integer().min(1).required().messages({
+      "any.required": "{{#label}} harus diisi",
+      "string.empty": "{{#label}} tidak boleh blank",
+      "number.min": "{{#label}} jumlah topup minimal 1",
+    }),
   });
 
   if (!req.header("x-auth-token")) {
@@ -186,7 +190,11 @@ const topupSaldo = async (req, res) => {
   let { nominal } = req.body;
   let token = req.header("x-auth-token");
   let schema = Joi.object({
-    nominal: Joi.number().integer().min(1000).required(),
+    nominal: Joi.number().integer().min(1000).required().messages({
+      "any.required": "{{#label}} harus diisi",
+      "string.empty": "{{#label}} tidak boleh blank",
+      "number.min": "{{#label}} jumlah topup minimal 1000",
+    }),
   });
   try {
     let res = await schema.validateAsync(req.body);
