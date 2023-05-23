@@ -29,6 +29,13 @@ async function getComment(id){
   return comments.findOne({where: {id_comment:id}});
 }
 
+//get All comments
+async function getAllComments(id_post){
+  return comments.findAll({where:{
+    id_post:id_post
+  }});
+}
+
 //check if comment exists
 async function commentExists(id) {
   return comments.count({ where: { id_comment: id } }).then((count) => {
@@ -70,7 +77,7 @@ async function profanityFilter(comment) {
   return config;
 }
 
-//add comment endpoint
+//add comment endpoint(CHECK PLS)
 const addComment = async (req, res) => {
   let token = req.header("x-auth-token");
   if (token) {
@@ -132,7 +139,7 @@ const addComment = async (req, res) => {
   }
 };
 
-//edit comment endpoint
+//edit comment endpoint (CHECK PLS) -Frans
 const editComment = async (req, res) => {
   let token = req.header("x-auth-token");
   if (token) {
@@ -191,10 +198,10 @@ const editComment = async (req, res) => {
   return res.status(400).send({ message: "Token is required but not found." });
 };
 
-//get all comments from post endpoint
-const getAllComments = async(req,res)=>{
+//get all comments from post (CHECK PLS) -Frans
+const getAllCommentsFromPost = async (req, res) => {
   let token = req.header("x-auth-token");
-  if(token){
+  if (token) {
     let userdata = "";
     try {
       userdata = jwt.verify(token, JWT_KEY);
@@ -202,11 +209,27 @@ const getAllComments = async(req,res)=>{
       return res.status(403).send("Unauthorized Token.");
     }
     
+    let schema = Joi.object({
+      id_post: Joi.string().required().messages({
+        "any.required": "{{#label}} harus diisi",
+        "string.empty": "{{#label}} tidak boleh blank",
+      }),
+    });
 
-  }
+    try {
+      await schema.validateAsync(req.body);
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+
+    let id_post = req.body.id_post;
+    
+    let foo = await getAllComments(id_post);
+    return res.status(200).send({comments:foo});
+  } 
   return res.status(400).send({ message: "Token is required but not found." });
-}
+};
 
 
 
-module.exports = { addComment, editComment, getAllComments,  };
+module.exports = { addComment, editComment, getAllCommentsFromPost };

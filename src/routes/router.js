@@ -12,14 +12,14 @@ router.get("/user/saldo", cekSaldo);
 router.get("/user/api_hit", cekApiHit);
 
 //comment endpoints
-const { addComment, editComment } = require("../controllers/commentController");
-const { addReply, editReply, deleteReply, deleteAllReply, likeReply } = require("../controllers/replyController");
-const { addPost, getAllPost } = require("../controllers/postController");
+const { addComment, editComment, getAllCommentsFromPost} = require("../controllers/commentController");
 
 router.post("/comment/add", addComment);
 router.put("/comment/edit", editComment);
 
 //reply endpoints
+const { addReply, editReply, deleteReply, deleteAllReply, likeReply } = require("../controllers/replyController");
+
 router.post("/reply/add", addReply);
 router.put("/reply/edit", editReply);
 router.delete("/reply/delete", deleteReply);
@@ -27,7 +27,10 @@ router.delete("/reply/deleteAll", deleteAllReply);
 router.post("/reply/like", likeReply);
 
 //posts endpoints
+const { addPost, getAllPost } = require("../controllers/postController");
+
 router.post("/post/add", addPost);
 router.get("/post/all", getAllPost);
+router.get("/post/comments", getAllCommentsFromPost);
 
 module.exports = router;
