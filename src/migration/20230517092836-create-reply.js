@@ -10,15 +10,22 @@ module.exports = {
       id_comment: {
         type: Sequelize.STRING,
       },
-      username:{
+      username: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       api_key: {
         type: Sequelize.STRING,
       },
       reply: {
         type: Sequelize.STRING,
+      },
+      like_count: {
+        type: Sequelize.INTEGER,
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
       },
     });
   },

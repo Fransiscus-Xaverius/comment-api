@@ -33,23 +33,24 @@ async function getPostCount() {
 }
 
 //add post endpoint (Unchecked)
-const addPost = async (req,res)=>{
-  console.log("masuk");
+const addPost = async (req, res) => {
+  // console.log(JWT_KEY);
   let token = req.header("x-auth-token");
-  if(token){
+  if (token) {
     let userdata = "";
     let cariUser;
 
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(403).send("Unauthorized Token.");
+      // return res.status(403).send("Unauthorized Token.");
+      return res.send(error.toString());
     }
     //Search for current user who's registering a new post.
     cariUser = await users.findOne({ where: { nama: userdata.nama } });
     //if current user exists, make post and return id_post
 
-    if(cariUser){
+    if (cariUser) {
       //generate post ID
       let id = await generatePostID();
       //get API key from token
@@ -61,18 +62,16 @@ const addPost = async (req,res)=>{
 
       return res.status(201).send({message:"New Post successfully added", id_post:id, API_HIT : curHit});
 
-    }
-    else{
+      return res.status(201).send({ message: "New Post successfully added", id_post: id });
+    } else {
       //Unreachable statement, but here just in case a user is deleted but the token is still active.
-      return res.status(400).send({message:"User not registered"})
+      return res.status(400).send({ message: "User not registered" });
     }
-
-  }
-  else res.status(400).send({ message: "Token is required but not found." });
-}
+  } else res.status(400).send({ message: "Token is required but not found." });
+};
 
 //get all post from user (Unchecked)
-const getAllPost = async (req,res) =>{
+const getAllPost = async (req, res) => {
   let token = req.header("x-auth-token");
   if(token){
     try {
@@ -89,4 +88,4 @@ const getAllPost = async (req,res) =>{
   else res.status(400).send({ message: "Token is required but not found."});
 }
 
-module.exports = {addPost, getAllPost}
+module.exports = { addPost, getAllPost };
