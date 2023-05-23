@@ -5,9 +5,13 @@ const sequelize = new Sequelize("db_proyekws", "root", "", {
   port: 3306,
   dialect: "mysql",
 });
+const { hit_api } = require("../controllers/userController");
+const jwt = require("jsonwebtoken");
+let JWT_KEY = process.env.JWT_KEY;
 
 //models
-const posts = require("../models/post");
+const users = require("../models/user")(sequelize, DataTypes);
+const posts = require("../models/post")(sequelize, DataTypes);
 
 //generate new post functions
 
@@ -36,24 +40,26 @@ const addPost = async (req,res)=>{
     let userdata = "";
     let cariUser;
 
-    //Search for current user who's registering a new post.
-
     try {
       userdata = jwt.verify(token, JWT_KEY);
-      cariUser = await users.findOne({ where: { nama: userdata.nama } });
     } catch (error) {
       return res.status(403).send("Unauthorized Token.");
     }
-
+    //Search for current user who's registering a new post.
+    cariUser = await users.findOne({ where: { nama: userdata.nama } });
     //if current user exists, make post and return id_post
 
     if(cariUser){
       //generate post ID
       let id = await generatePostID();
+      //get API key from token
+      let api_key = userdata.api_key;
       //create new post with ORM
-      await posts.create({id_post : id});
+      await posts.create({id_post : id, api_key:api_key});
       
-      return res.status(201).send({message:"New Post successfully added", id_post:id});
+      let curHit = await hit_api(api_key, 3);
+
+      return res.status(201).send({message:"New Post successfully added", id_post:id, API_HIT : curHit});
 
     }
     else{
@@ -69,8 +75,18 @@ const addPost = async (req,res)=>{
 const getAllPost = async (req,res) =>{
   let token = req.header("x-auth-token");
   if(token){
+    try {
+      userdata = jwt.verify(token, JWT_KEY);
+    } catch (error) {
+      return res.status(403).send("Unauthorized Token.");
+    }
+    //Search for current user who's registering a new post.
+    cariUser = await users.findOne({ where: { nama: userdata.nama } });
+
+    
 
   }
+  else res.status(400).send({ message: "Token is required but not found."});
 }
 
 module.exports = {addPost, getAllPost}

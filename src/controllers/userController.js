@@ -23,6 +23,32 @@ function generateString(length) {
   return result;
 }
 
+//api_hit function.
+async function hit_api(api_key, amount){
+  let userdata = await users.findOne({
+    where: {
+      api_key:api_key,
+    },
+  });
+
+  let curhit = userdata.api_hit;
+  
+  if(curhit>=amount) {
+    curhit-=amount;
+    users.update(
+      {
+        api_hit:curhit
+      },
+      {
+        where:{ api_key: api_key }
+      }
+    )
+    return curhit;
+  }
+  else return null;
+
+}
+
 async function getUser(nama) {
   let userGet = await users.findAll({
     where: {
@@ -272,4 +298,4 @@ const cekApiHit = async (req, res) => {
   }
 };
 
-module.exports = { coba, register, login, topupApiHit, topupSaldo, cekSaldo, cekApiHit };
+module.exports = { coba, register, login, topupApiHit, topupSaldo, cekSaldo, cekApiHit , hit_api};
