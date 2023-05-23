@@ -230,6 +230,19 @@ const getAllCommentsFromPost = async (req, res) => {
   return res.status(400).send({ message: "Token is required but not found." });
 };
 
+//like comment endpoint
+const likeComment = async (req,res)=>{
 
+}
+
+//delete comment
+const deleteComment = async (req,res)=>{
+
+}
+
+//delete all comment from post
+const deleteCommentFromPost = async (req,res)=>{
+  
+}
 
 module.exports = { addComment, editComment, getAllCommentsFromPost };
