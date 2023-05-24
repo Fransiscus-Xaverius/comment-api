@@ -343,6 +343,16 @@ const likeComment = async (req,res)=>{
               username: username,
               jenis: 0
             });
+            //tambah jumlah like
+            let jmlLikeAwal = parseInt(getComm[0].like_count);
+            let jmlLikeBaru = jmlLikeAwal + 1;
+            await comments.update({
+              like_count: jmlLikeBaru
+            },{
+              where:{
+                id_comment: id_comment,
+              }
+            });
             return res.status(200).send({message: "Berhasil Like Komentar "+id_comment.toUpperCase()});
           }else{
             return res.status(400).send({message: "Komentar sudah pernah dilike"});
@@ -479,4 +489,4 @@ const deleteCommentFromPost = async (req,res)=>{
   return res.status(400).send({ message: "Token is required but not found." });
 }
 
-module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, likeComment, deleteComment, deleteCommentFromPost};
+module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, likeComment, deleteComment, deleteCommentFromPost, generateLikeID};

@@ -16,6 +16,9 @@ const replies = require("../models/reply")(sequelize, DataTypes);
 const users = require("../models/user")(sequelize, DataTypes);
 const likes = require("../models/like")(sequelize, DataTypes);
 
+//import module
+const {generateLikeID} = require("../controllers/commentController");
+
 //helper function
 async function commentExists(id) {
   return comments.count({ where: { id_comment: id } }).then((count) => {
@@ -201,13 +204,17 @@ const deleteAllReply = async (req, res) => {
 //like reply endpoint
 const likeReply = async (req, res) => {
   let token = req.header("x-auth-token");
-  let { id_reply } = req.body;
+  let { id_reply, username } = req.body;
   if (token) {
     try {
       let userData = jwt.verify(token, JWT_KEY);
       let cariUser = await users.findOne({ where: { nama: userData.nama } });
       let schema = Joi.object({
         id_reply: Joi.string().required().messages({
+          "any.required": "{{#label}} harus diisi",
+          "string.empty": "{{#label}} tidak boleh blank",
+        }),
+        username: Joi.string().required().messages({
           "any.required": "{{#label}} harus diisi",
           "string.empty": "{{#label}} tidak boleh blank",
         }),
@@ -218,14 +225,20 @@ const likeReply = async (req, res) => {
         let cari = await replies.findOne({ where: { id_reply: id_reply, status: 1 } });
         if (cari) {
           //check if user has already liked this reply
-          let sudahLike = await likes.findOne({ where: { jenis: 1, username: cariUser.nama, id_comment: id_reply } });
+          let sudahLike = await likes.findOne({ where: { jenis: 1, username: username, id_comment: id_reply } });
           if (!sudahLike) {
-            let id;
-            let hitung = await likes.findAll();
-            if (hitung.length > 0) {
-              id = "L" + (parseInt(hitung[hitung.length - 1].dataValues.id_like.substring(1)) + 1);
-            } else id = "L1";
-            await likes.create({ id_like: id, id_comment: id_reply, id_post: null, username: cariUser.nama, jenis: 1 });
+            let id = await generateLikeID();
+            // let hitung = await likes.findAll();
+            // if (hitung.length > 0) {
+            //   id = "L" + (parseInt(hitung[hitung.length - 1].dataValues.id_like.substring(1)) + 1);
+            // } else id = "L1";
+            let ambil = await comments.findOne({
+              where:{
+                id_comment: cari.id_comment
+              }
+            }); 
+            console.log(ambil.id_post);
+            await likes.create({ id_like: id, id_comment: id_reply, id_post: ambil.id_post, username: username, jenis: 1 });
             res.status(201).send({ message: "Successfully liked this reply" });
           } else res.status(400).send({ message: "User has already liked this reply" });
         } else res.status(404).send({ message: "Reply not found" });
