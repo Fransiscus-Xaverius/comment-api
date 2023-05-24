@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       comment: DataTypes.STRING,
       api_key: DataTypes.STRING,
       like_count: DataTypes.INTEGER,
+      reply_count: DataTypes.INTEGER,
       gif_reaction: {
         type: DataTypes.JSON,
         defaultValue: [],
