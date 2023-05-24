@@ -303,6 +303,60 @@ const getAllCommentsFromPost = async (req, res) => {
   return res.status(400).send({ message: "Token is required but not found." });
 };
 
+// endpoint sort comment (silahkan di cek)
+const getAllCommentFromPostWithSort = async function(req, res){
+  let {id_post, type} = req.body;
+  let token = req.header("x-auth-token");
+
+  if(!req.header('x-auth-token')){
+    return res.status(400).send({ message: "Token is required but not found."});
+  }
+
+  let userdata;
+  try {
+    userdata = jwt.verify(token, JWT_KEY);
+  } catch (error) {
+    return res.status(403).send("Unauthorized Token.");
+  }
+
+  let schema = Joi.object({
+    id_post: Joi.string().required().messages({
+      "any.required": "{{#label}} harus diisi",
+      "string.empty": "{{#label}} tidak boleh blank",
+    }),
+    type: Joi.string()
+  });
+
+  try {
+    await schema.validateAsync(req.body);
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+
+  if (!type) {
+    type = 0;
+  }
+
+  let sortedComment;
+  if (type == 1) {
+    sortedComment = await getCommentWithSort(id_post, "createdAt", "ASC");
+  }
+  else if (type == 2) {
+    sortedComment = await getCommentWithSort(id_post, "createdAt", "DESC");
+  }
+  else if (type == 3) {
+    sortedComment = await getCommentWithSort(id_post, "like_count", "DESC");
+  }
+  else if (type == 4) {
+    sortedcomment = await getCommentWithSort(id_post, "reply_count", "DESC");
+  }
+  else if (type == 0) {
+    sortedComment = await getAllCommentsPost(id_post);
+  }
+
+  return res.status(200).send({comments: sortedComment});
+}
+
 //like comment endpoint
 const likeComment = async (req,res)=>{
   let token = req.header("x-auth-token");
