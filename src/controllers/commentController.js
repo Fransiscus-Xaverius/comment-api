@@ -198,6 +198,45 @@ const editComment = async (req, res) => {
   return res.status(400).send({ message: "Token is required but not found." });
 };
 
+const getSpecificComment = async function(req, res){
+  let token = req.header("x-auth-token");
+  let {id_komentar} = req.body;
+
+  if(!req.header('x-auth-token')){
+    return res.status(400).send({ message: "Token is required but not found."});
+  }
+
+  try {
+    let userdata = jwt.verify(token, JWT_KEY);
+  } catch (error) {
+    return res.status(403).send("Unauthorized Token.");
+  }
+
+  let schema = Joi.object({
+    id_komentar: Joi.string().required().messages({
+      "any.required": "{{#label}} harus diisi",
+      "string.empty": "{{#label}} tidak boleh blank",
+    }),
+  });
+
+  try {
+    await schema.validateAsync(req.body);
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+  
+  let commentGet = getComment(id_komentar);
+  if (commentGet.length == 0 ) {
+    return res.status(404).send({ message: "Comment not found."});
+  }
+
+  if (commentGet[0].api_key != userdata.api_key) {
+    return res.status(400).send({message: "Unauthorized Token. Comment belongs to another user."})
+  }
+
+  return res.status(200).send({comment: commentGet[0]});
+}
+
 //get all comments from post (CHECK PLS) -Frans
 const getAllCommentsFromPost = async (req, res) => {
   let token = req.header("x-auth-token");
@@ -245,4 +284,4 @@ const deleteCommentFromPost = async (req,res)=>{
   
 }
 
-module.exports = { addComment, editComment, getAllCommentsFromPost };
+module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment };
