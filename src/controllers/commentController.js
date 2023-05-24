@@ -85,9 +85,9 @@ async function generateLikeID() {
   let lastOrder = 0;
   let temp = await likes.findAll();
   if(temp.length > 0){
-    lastOrder = temp[temp.length-1].substr(1, 4);
+    lastOrder = parseInt(temp[temp.length-1].id_like.substr(1, 4));
   }
-  let newOrder = parseInt(lastOrder)+1;
+  let newOrder = lastOrder+1;
   let newID = "L"+ newOrder.toString().padStart(3, 0);
   return newID;
 }
@@ -339,7 +339,7 @@ const likeComment = async (req,res)=>{
             await likes.create({
               id_like: idBaru,
               id_comment: id_comment,
-              id_post: null,
+              id_post: getComm[0].id_post,
               username: username,
               jenis: 0
             });
