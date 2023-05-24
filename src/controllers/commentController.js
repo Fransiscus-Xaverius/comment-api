@@ -79,6 +79,19 @@ async function generateCommentID() {
   return generateID;
 }
 
+//generate like ID
+async function generateLikeID() {
+  let awal = "L";
+  let lastOrder = 0;
+  let temp = await likes.findAll();
+  if(temp.length > 0){
+    lastOrder = temp[temp.length-1].substr(1, 4);
+  }
+  let newOrder = parseInt(lastOrder)+1;
+  let newID = "L"+ newOrder.padStart(3, 0);
+  return newID;
+}
+
 async function profanityFilter(comment) {
   const config = {
     method: "POST",
@@ -291,7 +304,64 @@ const getAllCommentsFromPost = async (req, res) => {
 
 //like comment endpoint
 const likeComment = async (req,res)=>{
+  let token = req.header("x-auth-token");
+  let {id_comment, username} = req.body;
+  if(token){
+    let schema = Joi.object({
+      id_comment: Joi.string().required().messages({
+        "any.required": "{{#label}} harus diisi",
+        "string.empty": "{{#label}} tidak boleh blank",
+      }),
+      username: Joi.string().required().messages({
+        "any.required": "{{#label}} harus diisi",
+        "string.empty": "{{#label}} tidak boleh blank",
+      }),
+    });
+    try {
+      await schema.validateAsync(req.body);
+    } catch (error) {
+      return res.status(400).send({message: error.message});
+    }
+    try {
+      let temp = jwt.verify(token, JWT_KEY);
+      let getComm = await comments.findAll({
+        where:{
+          id_comment: id_comment,
+          status: 1,
+        }
+      });
+      if(getComm.length > 0){//comment ada
+        let idUser = temp.api_key;
+        if(await commentOwnedByUser(id_comment, idUser)){
+          let alreadyLike = await likes.findOne({ where: { jenis: 0, username: username, id_comment: id_comment } });
+          if(!alreadyLike){//like pertama kali
+            await likes.create({ id_like: id, id_comment: id_reply, id_post: null, username: cariUser.nama, jenis: 1 });
+            let idBaru = await generateLikeID();
+            await likes.create({
+              id_like: idBaru,
+              id_comment: id_comment,
+              id_post: null,
+              username: username,
+              jenis: 0
+            });
+            return res.status(200).send({message: "Berhasil Like Komentar "+id_comment.toUpperCase()});
+          }else{
+            return res.status(400).send({message: "Komentar sudah pernah dilike"});
+          }
+        }else{
+          return res.status(400).send({message: "Can't Like. Comment belongs to another user"});
+        }
+      }else{
+        return res.status(404).send({message: "Comment not found"});
+      }
 
+    } catch (error) {
+      // console.log(error);
+      return res.status(403).send({message: "Unauthorized Access"});
+    }
+
+  }
+  return res.status(400).send({ message: "Token is required but not found." });
 }
 
 //delete comment
@@ -410,4 +480,4 @@ const deleteCommentFromPost = async (req,res)=>{
   return res.status(400).send({ message: "Token is required but not found." });
 }
 
-module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, deleteComment, deleteCommentFromPost};
+module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, likeComment, deleteComment, deleteCommentFromPost};
