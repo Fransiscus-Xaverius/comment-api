@@ -19,6 +19,7 @@ module.exports = {
       },
       jenis: {
         type: Sequelize.INTEGER,
+        comment: "comment = 0, reply = 1"
       },
     });
   },

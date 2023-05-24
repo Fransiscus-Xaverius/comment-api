@@ -14,9 +14,13 @@ const JWT_KEY = process.env.JWT_KEY;
 const comments = require("../models/comment")(sequelize, DataTypes);
 const replies = require("../models/reply")(sequelize, DataTypes);
 const users = require("../models/user")(sequelize, DataTypes);
+const likes = require("../models/like")(sequelize, DataTypes);
+const posts = require("../models/post")(sequelize, DataTypes);
+
 
 //module imports
 const { isUserPost } = require("../controllers/postController");
+const comment = require("../models/comment");
 
 //get Comment count
 async function getCommentCount() {
@@ -44,6 +48,22 @@ async function commentExists(id) {
     }
     return false;
   });
+}
+
+//check if a comment is owned by user
+async function commentOwnedByUser(idComment, apiKeyUser){
+  let hasil = false;
+  let getComment = await comments.findOne({
+    where:{
+      id_comment: idComment
+    }
+  });
+  if(getComment){
+    if(getComment.api_key == apiKeyUser){
+      hasil = true;
+    }
+  }
+  return hasil;
 }
 
 //generate comment ID
@@ -276,12 +296,99 @@ const likeComment = async (req,res)=>{
 
 //delete comment
 const deleteComment = async (req,res)=>{
+  let token = req.header("x-auth-token");
+  if(token){
+    let schema = Joi.object({
+      id_comment: Joi.string().required().messages({
+        "any.required": "{{#label}} harus diisi",
+        "string.empty": "{{#label}} tidak boleh blank",
+      }),
+    });
+    try {
+      await schema.validateAsync(req.body);
+    } catch (error) {
+      return res.status(400).send(error.toString());
+    }
+    let id = req.body.id_comment;
+    try {
+      let temp = jwt.verify(token, JWT_KEY);
+      if(await commentExists(id)){
+        let idUser = temp.api_key;
+        if(await commentOwnedByUser(id, idUser)){
+          //delete comment
+          await comments.update({
+            status: 0
+          },{
+            where:{
+              id_comment: id
+            }
+          });
+          //clear likes
 
+        }else{
+          return res.status(400).send("Can't delete. Comment belongs to another user");
+        }
+      }else{
+        return res.status(404).send("Comment not found");
+      }
+
+    } catch (error) {
+      return res.status(403).send("Unauthorized Access");
+    }
+
+  }
+  return res.status(400).send({ message: "Token is required but not found." });
 }
 
 //delete all comment from post
 const deleteCommentFromPost = async (req,res)=>{
-  
+  let token = req.header("x-auth-token");
+  let {id_post} = req.body;
+  if(token){
+    let schema = Joi.object({
+      id_post: Joi.string().required().messages({
+        "any.required": "{{#label}} harus diisi",
+        "string.empty": "{{#label}} tidak boleh blank",
+      }),
+    });
+    try {
+      await schema.validateAsync(req.body);
+    } catch (error) {
+      return res.status(400).send(error.toString());
+    }
+    try {
+      let temp = jwt.verify(token, JWT_KEY);
+      let cek = await posts.findOne({
+        where:{
+          id_post: id_post
+        }
+      });
+      if(cek){//post ada
+        if(cek.api_key == temp.api_key){//benar pemilik dari post
+          //delete all comment
+          await comments.update({
+            status: 0
+          },{
+            where:{
+              id_post: id_post
+            }
+          });
+          //clear likes
+
+
+        }else{
+          return res.status(400).send("Can't delete. Comments belongs to another user");
+        }
+      }else{
+        return res.status(404).send("Post not found");
+      }
+
+    } catch (error) {
+      return res.status(403).send("Unauthorized Access");
+    }
+
+  }
+  return res.status(400).send({ message: "Token is required but not found." });
 }
 
-module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment };
+module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, deleteComment, deleteCommentFromPost};
