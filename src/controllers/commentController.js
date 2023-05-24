@@ -88,7 +88,7 @@ async function generateLikeID() {
     lastOrder = temp[temp.length-1].substr(1, 4);
   }
   let newOrder = parseInt(lastOrder)+1;
-  let newID = "L"+ newOrder.padStart(3, 0);
+  let newID = "L"+ newOrder.toString().padStart(3, 0);
   return newID;
 }
 
@@ -335,7 +335,6 @@ const likeComment = async (req,res)=>{
         if(await commentOwnedByUser(id_comment, idUser)){
           let alreadyLike = await likes.findOne({ where: { jenis: 0, username: username, id_comment: id_comment } });
           if(!alreadyLike){//like pertama kali
-            await likes.create({ id_like: id, id_comment: id_reply, id_post: null, username: cariUser.nama, jenis: 1 });
             let idBaru = await generateLikeID();
             await likes.create({
               id_like: idBaru,
@@ -356,7 +355,7 @@ const likeComment = async (req,res)=>{
       }
 
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       return res.status(403).send({message: "Unauthorized Access"});
     }
 
