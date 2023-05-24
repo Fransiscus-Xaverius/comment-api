@@ -17,7 +17,7 @@ const { addComment, editComment, getAllCommentsFromPost, getSpecificComment, del
 router.post("/comment/add", addComment);
 router.put("/comment/edit", editComment);
 router.get("/comment/specific_comment", getSpecificComment);
-router.delete("/comment/delete", deleteComment);
+router.delete("/comment", deleteComment);
 
 //reply endpoints
 const { addReply, editReply, deleteReply, deleteAllReply, likeReply } = require("../controllers/replyController");

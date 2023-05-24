@@ -42,7 +42,7 @@ async function getAllComments(id_post){
 
 //check if comment exists
 async function commentExists(id) {
-  return comments.count({ where: { id_comment: id } }).then((count) => {
+  return comments.count({ where: { id_comment: id, status: 1} }).then((count) => {
     if (count != 0) {
       return true;
     }
@@ -107,7 +107,7 @@ const addComment = async (req, res) => {
       userdata = jwt.verify(token, JWT_KEY);
       cariUser = await users.findOne({ where: { nama: userdata.nama } });
     } catch (error) {
-      return res.status(403).send("Unauthorized Token.");
+      return res.status(403).send({message: "Unauthorized Token."});
     }
 
     let username = userdata.nama;
@@ -167,7 +167,7 @@ const editComment = async (req, res) => {
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(403).send("Unauthorized Token.");
+      return res.status(403).send({message: "Unauthorized Token."});
     }
 
     let username = userdata.nama;
@@ -190,7 +190,7 @@ const editComment = async (req, res) => {
     }
     let id = req.body.id_comment;
     let new_comment = req.body.new_comment;
-    let existed = await commentExists(id);
+    let existed = await commentExists(id); 
     if (!existed) return res.status(404).send({ message: "Comment doesn't exists." });
 
     let oldComment = await getComment(id);
@@ -229,7 +229,7 @@ const getSpecificComment = async function(req, res){
   try {
     let userdata = jwt.verify(token, JWT_KEY);
   } catch (error) {
-    return res.status(403).send("Unauthorized Token.");
+    return res.status(403).send({message: "Unauthorized Token."});
   }
 
   let schema = Joi.object({
@@ -242,7 +242,7 @@ const getSpecificComment = async function(req, res){
   try {
     await schema.validateAsync(req.body);
   } catch (error) {
-    return res.status(400).send(error.message);
+    return res.status(400).send({message: error.message});
   }
   
   let commentGet = getComment(id_komentar);
@@ -265,7 +265,7 @@ const getAllCommentsFromPost = async (req, res) => {
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(403).send("Unauthorized Token.");
+      return res.status(403).send({message: "Unauthorized Token."});
     }
     
     let schema = Joi.object({
@@ -297,6 +297,7 @@ const likeComment = async (req,res)=>{
 //delete comment
 const deleteComment = async (req,res)=>{
   let token = req.header("x-auth-token");
+  let {id_comment} = req.body;
   if(token){
     let schema = Joi.object({
       id_comment: Joi.string().required().messages({
@@ -307,33 +308,40 @@ const deleteComment = async (req,res)=>{
     try {
       await schema.validateAsync(req.body);
     } catch (error) {
-      return res.status(400).send(error.toString());
+      return res.status(400).send({message: error.message});
     }
-    let id = req.body.id_comment;
     try {
       let temp = jwt.verify(token, JWT_KEY);
-      if(await commentExists(id)){
+      let getComm = await comments.findAll({
+        where:{
+          id_comment: id_comment,
+          status: 1,
+        }
+      });
+      if(getComm.length > 0){
         let idUser = temp.api_key;
-        if(await commentOwnedByUser(id, idUser)){
+        if(await commentOwnedByUser(id_comment, idUser)){
           //delete comment
           await comments.update({
             status: 0
           },{
             where:{
-              id_comment: id
+              id_comment: id_comment
             }
           });
           //clear likes
 
+          return res.status(200).send({message: "Berhasil Menghapus Komentar "+id_comment.toUpperCase()});
         }else{
-          return res.status(400).send("Can't delete. Comment belongs to another user");
+          return res.status(400).send({message: "Can't delete. Comment belongs to another user"});
         }
       }else{
-        return res.status(404).send("Comment not found");
+        return res.status(404).send({message: "Comment not found"});
       }
 
     } catch (error) {
-      return res.status(403).send("Unauthorized Access");
+      // console.log(error);
+      return res.status(403).send({message: "Unauthorized Access"});
     }
 
   }
@@ -354,7 +362,7 @@ const deleteCommentFromPost = async (req,res)=>{
     try {
       await schema.validateAsync(req.body);
     } catch (error) {
-      return res.status(400).send(error.toString());
+      return res.status(400).send({message: error.message});
     }
     try {
       let temp = jwt.verify(token, JWT_KEY);
@@ -365,6 +373,16 @@ const deleteCommentFromPost = async (req,res)=>{
       });
       if(cek){//post ada
         if(cek.api_key == temp.api_key){//benar pemilik dari post
+          let allComm = await comments.findAll({
+            where:{
+              id_post: id_post,
+              status: 1
+            }
+          });
+          if(allComm.length == 0){
+            return res.status(400).send({message: "Belum Ada Komentar di Post "+id_post.toUpperCase()});
+          }
+
           //delete all comment
           await comments.update({
             status: 0
@@ -375,16 +393,17 @@ const deleteCommentFromPost = async (req,res)=>{
           });
           //clear likes
 
-
+          return res.status(200).send({message: "Berhasil Menghapus Semua Komentar Dari Post "+id_post.toUpperCase()});
         }else{
-          return res.status(400).send("Can't delete. Comments belongs to another user");
+          return res.status(400).send({message: "Can't delete. Comments belongs to another user"});
         }
       }else{
-        return res.status(404).send("Post not found");
+        return res.status(404).send({message: "Post not found"});
       }
 
     } catch (error) {
-      return res.status(403).send("Unauthorized Access");
+      // console.log(error);
+      return res.status(403).send({message: "Unauthorized Access"});
     }
 
   }
