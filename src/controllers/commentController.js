@@ -351,7 +351,7 @@ const getAllCommentFromPostWithSort = async function(req, res){
     sortedcomment = await getCommentWithSort(id_post, "reply_count", "DESC");
   }
   else if (type == 0) {
-    sortedComment = await getAllCommentsPost(id_post);
+    sortedComment = await getAllComments(id_post);
   }
 
   return res.status(200).send({comments: sortedComment});
@@ -544,4 +544,4 @@ const deleteCommentFromPost = async (req,res)=>{
   return res.status(400).send({ message: "Token is required but not found." });
 }
 
-module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, likeComment, deleteComment, deleteCommentFromPost, generateLikeID};
+module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, getAllCommentFromPostWithSort, likeComment, deleteComment, deleteCommentFromPost, generateLikeID};
