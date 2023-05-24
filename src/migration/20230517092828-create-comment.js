@@ -24,6 +24,9 @@ module.exports = {
       like_count: {
         type: Sequelize.INTEGER,
       },
+      reply_count: {
+        type: Sequelize.INTEGER,
+      },
       gif_reaction: {
         type: Sequelize.JSON,
         defaultValue: [],
