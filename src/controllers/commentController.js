@@ -239,8 +239,9 @@ const getSpecificComment = async function(req, res){
     return res.status(400).send({ message: "Token is required but not found."});
   }
 
+  let userdata = "";
   try {
-    let userdata = jwt.verify(token, JWT_KEY);
+    userdata = jwt.verify(token, JWT_KEY);
   } catch (error) {
     return res.status(403).send({message: "Unauthorized Token."});
   }
