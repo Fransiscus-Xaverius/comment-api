@@ -20,6 +20,10 @@ module.exports = {
         comment: "Testing comment!",
         api_key: "6r5hkilw4q",
         like_count: 0, 
+        reply_count: 0,
+        gif_reaction: "[]",
+        createdAt: Sequelize.fn("now"),
+        updatedAt: Sequelize.fn("now"),
       }
     ],{});
   },

@@ -92,6 +92,16 @@ async function generateLikeID() {
   return newID;
 }
 
+//get comment with sort
+async function getCommentWithSort(id_post, category, sort) {
+  return comments.findAll({
+    where:{
+      id_post:id_post
+    },
+    order:[[`${category}`, `${sort}`]],
+  });
+}
+
 async function profanityFilter(comment) {
   const config = {
     method: "POST",
@@ -259,16 +269,16 @@ const getSpecificComment = async function(req, res){
     return res.status(400).send({message: error.message});
   }
   
-  let commentGet = getComment(id_komentar);
-  if (commentGet.length == 0 ) {
+  let commentGet = await getComment(id_komentar);
+  if (!commentGet) {
     return res.status(404).send({ message: "Comment not found."});
   }
-
-  if (commentGet[0].api_key != userdata.api_key) {
-    return res.status(400).send({message: "Unauthorized Token. Comment belongs to another user."})
+  // console.log(commentGet);
+  if (commentGet.api_key != userdata.api_key) {
+    return res.status(400).send({message: "Unauthorized Token. Comment belongs to another user."}) 
   }
 
-  return res.status(200).send({comment: commentGet[0]});
+  return res.status(200).send({comment: commentGet});
 }
 
 //get all comments from post (CHECK PLS) -Frans
