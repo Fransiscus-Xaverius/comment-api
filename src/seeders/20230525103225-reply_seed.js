@@ -21,6 +21,7 @@ module.exports = {
         api_key: "6r5hkilw4q",
         reply: "It is really interesting!",
         like_count: 0,
+        updatedAt: Sequelize.fn("now"),
       }
     ],{});
 
