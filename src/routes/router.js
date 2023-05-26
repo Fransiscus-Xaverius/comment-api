@@ -12,7 +12,7 @@ router.get("/user/saldo", cekSaldo);
 router.get("/user/api_hit", cekApiHit);
 
 //comment endpoints
-const { addComment, editComment, getAllCommentsFromPost, getSpecificComment, getAllCommentFromPostWithSort, likeComment,deleteComment, deleteCommentFromPost} = require("../controllers/commentController");
+const { addComment, editComment, getAllCommentsFromPost, getSpecificComment, getAllCommentFromPostWithSort, gifUpload, likeComment,deleteComment, deleteCommentFromPost} = require("../controllers/commentController");
 
 router.post("/comment", addComment);
 router.put("/comment", editComment);
@@ -20,6 +20,7 @@ router.post("/comment/like", likeComment);
 router.get("/comment", getSpecificComment);
 router.get("/comment/sort", getAllCommentFromPostWithSort);
 router.delete("/comment", deleteComment);
+router.post("/comment/gif_reaction", gifUpload);
 
 //reply endpoints
 const { addReply, editReply, deleteReply, deleteAllReply, likeReply } = require("../controllers/replyController");
