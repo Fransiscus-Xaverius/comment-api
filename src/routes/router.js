@@ -15,7 +15,7 @@ router.get("/user/api_hit", cekApiHit);
 const { addComment, editComment, getAllCommentsFromPost, getSpecificComment, getAllCommentFromPostWithSort, likeComment,deleteComment, deleteCommentFromPost} = require("../controllers/commentController");
 
 router.post("/comment", addComment);
-router.put("/comment/edit", editComment);
+router.put("/comment", editComment);
 router.post("/comment/like", likeComment);
 router.get("/comment", getSpecificComment);
 router.get("/comment/sort", getAllCommentFromPostWithSort);
@@ -25,7 +25,7 @@ router.delete("/comment", deleteComment);
 const { addReply, editReply, deleteReply, deleteAllReply, likeReply } = require("../controllers/replyController");
 
 router.post("/reply", addReply);
-router.put("/reply/edit", editReply);
+router.put("/reply", editReply);
 router.delete("/reply", deleteReply);
 router.delete("/reply/deleteAll", deleteAllReply);
 router.post("/reply/like", likeReply);
