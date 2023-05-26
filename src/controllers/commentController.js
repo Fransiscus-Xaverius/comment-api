@@ -8,6 +8,20 @@ const sequelize = new Sequelize("db_proyekws", "root", "", {
 const Joi = require("joi");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const fs = require("fs");
+const upload = multer({
+  dest: "./uploads",
+  fileFilter: function (req, file, cb) {
+    if (file.mimetype != "image/gif") {
+      return cb(new Error("Wrong file type"), null);
+    }
+    cb(null, true);
+  },
+  limits: {
+    fileSize: 10000000
+  }
+});
 const JWT_KEY = process.env.JWT_KEY;
 
 //models
@@ -367,6 +381,70 @@ const getAllCommentFromPostWithSort = async function(req, res){
   return res.status(200).send({comments: sortedComment});
 }
 
+const gifUpload = async function(req, res){
+  const uploadGif = upload.single("gif_reaction");
+  uploadGif(req, res, async function (err) {
+    console.log(req.body);
+    let {id_komentar} = req.body;
+    let token = req.header("x-auth-token"); 
+
+    if(!req.header('x-auth-token')){
+      return res.status(400).send({ message: "Token is required but not found."});
+    }
+
+    let userdata;
+    try {
+      userdata = jwt.verify(token, JWT_KEY);
+    } catch (error) {
+      return res.status(403).send("Unauthorized Token.");
+    }
+
+    let schema = Joi.object({
+      id_komentar: Joi.string().required().messages({
+        "any.required": "{{#label}} harus diisi",
+        "string.empty": "{{#label}} tidak boleh blank",
+      }),
+    });
+
+    try {
+      await schema.validateAsync(req.body);
+    } catch (error) {
+      return res.status(400).send(error.message);
+    }
+    let gif = [];
+    let gif1 = await getComment(id_komentar);
+    let gif2 = JSON.parse(gif1.gif_reaction);
+    
+    for (let i = 0; i < gif2.length; i++) {
+      gif.push(gif2[i]);
+    }
+    console.log(gif);
+    
+    if (gif1.length == 0 ) {
+      return res.status(404).send({ message: "Comment not found."});
+    }
+
+    let urutan = parseInt(gif.length) + 1;
+    if (err) {
+      return res.status(400).send(err);
+    }
+    
+    const filename = `${id_komentar}_${urutan}.gif`;
+    fs.renameSync(`./uploads/${req.file.filename}`,
+      `./uploads/${filename}`);
+    
+      gif.push(filename);
+      await comments.update({
+        gif_reaction: gif
+      },{
+        where:{
+          id_comment: id_komentar
+        }
+      })
+      return res.status(200).send({message: "Berhasil mengupload gif"});
+  });
+}
+
 //like comment endpoint
 const likeComment = async (req,res)=>{
   let token = req.header("x-auth-token");
@@ -554,4 +632,4 @@ const deleteCommentFromPost = async (req,res)=>{
   return res.status(400).send({ message: "Token is required but not found." });
 }
 
-module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, getAllCommentFromPostWithSort, likeComment, deleteComment, deleteCommentFromPost, generateLikeID};
+module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, getAllCommentFromPostWithSort, gifUpload, likeComment, deleteComment, deleteCommentFromPost, generateLikeID};
