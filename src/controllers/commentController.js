@@ -122,7 +122,7 @@ async function profanityFilter(comment) {
     url: "https://profanity-cleaner-bad-word-filter.p.rapidapi.com/profanity",
     headers: {
       "content-type": "application/json",
-      "X-RapidAPI-Key": "e4a7b1cb50msh26faaaa06e35551p116f2bjsnc9d69790c133",
+      "X-RapidAPI-Key": process.env.PROFANITY_FILTER_KEY,
       "X-RapidAPI-Host": "profanity-cleaner-bad-word-filter.p.rapidapi.com",
     },
     data: {
