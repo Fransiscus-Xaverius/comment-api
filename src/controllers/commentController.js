@@ -35,6 +35,7 @@ const posts = require("../models/post")(sequelize, DataTypes);
 //module imports
 const { isUserPost } = require("../controllers/postController");
 const comment = require("../models/comment");
+const { hit_api } = require('../controllers/userController');
 
 //get Comment count
 async function getCommentCount() {
@@ -186,6 +187,9 @@ const addComment = async (req, res) => {
         comment: result.data.clean,
       };
 
+      //API Hit Charge
+      await hit_api(api_key,2);
+
       return res.status(201).send({ message: " Berhasil menambahkan komentar", data: temp });
     } else {
       return res.status(400).send({ msg: "Something went wrong! please try again later. ERR CODE 001" });
@@ -250,6 +254,10 @@ const editComment = async (req, res) => {
       id: id,
       new_comment: result.data.clean,
     };
+
+    //charge API Hit
+    await hit_api(api_key,2);
+
     return res.status(200).send({ message: "Berhasil update comment", data: data });
   } 
   return res.status(400).send({ message: "Token is required but not found." });
@@ -305,6 +313,8 @@ const getAllCommentsFromPost = async (req, res) => {
     } catch (error) {
       return res.status(403).send({message: "Unauthorized Token."});
     }
+
+    let api_key = userdata.api_key;
     
     let schema = Joi.object({
       id_post: Joi.string().required().messages({
@@ -322,6 +332,10 @@ const getAllCommentsFromPost = async (req, res) => {
     let id_post = req.body.id_post;
     
     let foo = await getAllComments(id_post);
+
+    //charge API hit
+    await hit_api(api_key,5);
+
     return res.status(200).send({comments:foo});
   } 
   return res.status(400).send({ message: "Token is required but not found." });
@@ -342,6 +356,8 @@ const getAllCommentFromPostWithSort = async function(req, res){
   } catch (error) {
     return res.status(403).send("Unauthorized Token.");
   }
+
+  let api_key = userdata.api_key;
 
   let schema = Joi.object({
     id_post: Joi.string().required().messages({
@@ -377,6 +393,9 @@ const getAllCommentFromPostWithSort = async function(req, res){
   else if (type == 0) {
     sortedComment = await getAllComments(id_post);
   }
+
+  //charge API Hit
+  await hit_api(api_key,5);
 
   return res.status(200).send({comments: sortedComment});
 }
