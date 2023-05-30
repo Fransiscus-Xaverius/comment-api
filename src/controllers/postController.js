@@ -5,7 +5,6 @@ const sequelize = new Sequelize("db_proyekws", "root", "", {
   port: 3306,
   dialect: "mysql",
 });
-const { hit_api } = require("../controllers/userController");
 const jwt = require("jsonwebtoken");
 let JWT_KEY = process.env.JWT_KEY;
 
@@ -13,6 +12,10 @@ let JWT_KEY = process.env.JWT_KEY;
 const users = require("../models/user")(sequelize, DataTypes);
 const posts = require("../models/post")(sequelize, DataTypes);
 
+//module imports 
+const { hit_api } = require('../controllers/userController');
+
+//===================HELPER FUNCTIONS======================
 //generate new post functions
 
 async function generatePostID() {
@@ -41,8 +44,11 @@ async function isUserPost(api_key, id_post){
   let fuckthisshit = await getPost(id_post);
   return fuckthisshit==api_key
 }
+//=========================================================
 
-//add post endpoint (Unchecked)
+//ENDPOINTS
+
+//add post endpoint (Hit : 5)
 const addPost = async (req, res) => {
   // console.log(JWT_KEY);
   let token = req.header("x-auth-token");
@@ -70,6 +76,9 @@ const addPost = async (req, res) => {
       
       let curHit = await hit_api(api_key, 3);
 
+      //API Hit Charge
+      await hit_api(api_key,5);
+
       return res.status(201).send({message:"New Post successfully added", id_post:id, API_HIT : curHit});
     } else {
       //Unreachable statement, but here just in case a user is deleted but the token is still active.
@@ -78,7 +87,7 @@ const addPost = async (req, res) => {
   } else res.status(400).send({ message: "Token is required but not found." });
 };
 
-//get all post from user (Unchecked)
+//get all post from user (Unchecked) (Hit : 10)
 const getAllPost = async (req, res) => {
   let token = req.header("x-auth-token");
   if(token){
@@ -105,6 +114,10 @@ const getAllPost = async (req, res) => {
         const element = allPosts[index];
         foo.push(element.id_post);
       }
+
+      //API Hit Charge
+      await hit_api(api_key,10);
+
       return res.status(200).send({
         username:cariUser.username,
         api_key: cariUser.api_key,

@@ -18,8 +18,10 @@ const likes = require("../models/like")(sequelize, DataTypes);
 
 //import module
 const {generateLikeID} = require("../controllers/commentController");
+const { hit_api } = require('../controllers/userController');
 
-//helper function
+//===================HELPER FUNCTIONS======================
+
 async function commentExists(id) {
   return comments.count({ where: { id_comment: id } }).then((count) => {
     if (count != 0) {
@@ -28,7 +30,9 @@ async function commentExists(id) {
     return false;
   });
 }
+//=========================================================
 
+//FILTER FUNCTION
 async function profanityFilter(comment) {
   const config = {
     method: "POST",
@@ -46,7 +50,10 @@ async function profanityFilter(comment) {
   };
   return config;
 }
-//add reply endpoint
+
+//ENDPOINTS
+
+//add reply endpoint (Hit : 2)
 const addReply = async (req, res) => {
   let { reply, id_comment } = req.body;
   let token = req.header("x-auth-token");
@@ -81,6 +88,8 @@ const addReply = async (req, res) => {
               id = "R" + (hitung.length + 1).toString().padStart(3, 0);
             } else id = "R001";
             await replies.create({ id_reply: id, id_comment: id_comment, username: userData.nama, api_key: cariUser.api_key, reply: result.data.clean });
+            //API Hit Charge
+            await hit_api(api_key,2);
             return res.status(201).send({ message: "Berhasil menambahkan reply" });
           }
         }
@@ -95,7 +104,7 @@ const addReply = async (req, res) => {
   } else res.status(400).send({ message: "Token is nowhere to be found.." });
 };
 
-//edit reply endpoint
+//edit reply endpoint (Hit : 2)
 const editReply = async (req, res) => {
   let { id_reply, new_reply } = req.body;
   let token = req.header("x-auth-token");
@@ -125,6 +134,8 @@ const editReply = async (req, res) => {
           else {
             //update reply
             await replies.update({ reply: result.data.clean }, { where: { id_reply: id_reply } });
+            //API Hit Charge
+            await hit_api(api_key,2);
             res.status(201).send({ message: "Reply successfully updated" });
           }
         } catch (error) {
@@ -137,7 +148,7 @@ const editReply = async (req, res) => {
   } else return res.status(403).send({ message: "Token is nowhere to be found..." });
 };
 
-//delete reply with specified id
+//delete reply with specified id endpoint (Hit : 2)
 const deleteReply = async (req, res) => {
   let { id_reply } = req.body;
   let token = req.header("x-auth-token");
@@ -159,6 +170,8 @@ const deleteReply = async (req, res) => {
           //remove like related to that reply (0 comment 1 reply)
           //if like type==1, id_comment==id_reply
           await likes.destroy({ where: { jenis: 1, id_comment: id_reply } });
+          //API Hit Charge
+          await hit_api(api_key,2);
           return res.status(200).send({ message: "Reply successfully deleted" });
         } else res.status(404).send({ message: "Reply not found" });
       } catch (error) {
@@ -170,7 +183,7 @@ const deleteReply = async (req, res) => {
   } else return res.status(400).send({ message: "Token is missing.." });
 };
 
-//delete all reply in a specified comment
+//delete all reply in a specified comment endpoint (Hit :5)
 const deleteAllReply = async (req, res) => {
   let token = req.header("x-auth-token");
   let { id_comment } = req.body;
@@ -190,6 +203,8 @@ const deleteAllReply = async (req, res) => {
           await replies.update({ status: 0 }, { where: { id_comment: id_comment } });
           //remove all likes related to those replies (0= comment 1=reply) (UNDONE)
           //   await likes.destroy({ where: { jenis:1, id_comment:   } });
+          //API Hit Charge
+          await hit_api(api_key,5);
           return res.status(201).send({ message: "All replies of this comment are successfully deleted!" });
         } else return res.status(404).send({ message: "Comment not found" });
       } catch (error) {
@@ -201,7 +216,7 @@ const deleteAllReply = async (req, res) => {
   } else res.status(400).send({ message: "Token is nowhere to be found" });
 };
 
-//like reply endpoint
+//like reply endpoint (Hit : 2)
 const likeReply = async (req, res) => {
   let token = req.header("x-auth-token");
   let { id_reply, username } = req.body;
@@ -239,6 +254,8 @@ const likeReply = async (req, res) => {
             }); 
             console.log(ambil.id_post);
             await likes.create({ id_like: id, id_comment: id_reply, id_post: ambil.id_post, username: username, jenis: 1 });
+            //API Hit Charge
+            await hit_api(api_key,2);
             res.status(201).send({ message: "Successfully liked this reply" });
           } else res.status(400).send({ message: "User has already liked this reply" });
         } else res.status(404).send({ message: "Reply not found" });
@@ -250,4 +267,5 @@ const likeReply = async (req, res) => {
     }
   } else res.status(400).send({ message: "Token is nowhere to be found" });
 };
+
 module.exports = { addReply, editReply, deleteReply, deleteAllReply, likeReply };

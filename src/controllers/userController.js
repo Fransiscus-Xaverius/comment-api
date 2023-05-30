@@ -13,6 +13,8 @@ const users = require("../models/user")(sequelize, DataTypes);
 //helper function
 const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
+//===================HELPER FUNCTIONS======================
+
 function generateString(length) {
   let result = "";
   const charactersLength = characters.length;
@@ -58,8 +60,6 @@ async function getUser(nama) {
 
   return userGet;
 }
-
-async function userGetByKey(key) {}
 
 const coba = (req, res) => {
   return res.status(200).send("Test");

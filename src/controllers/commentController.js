@@ -143,7 +143,7 @@ async function profanityFilter(comment) {
 
 //ENDPOINTS
 
-//add comment endpoint(CHECK PLS)
+//add comment endpoint(CHECK PLS) (Hit : 2)
 const addComment = async (req, res) => {
   let token = req.header("x-auth-token");
   if (token) {
@@ -208,7 +208,7 @@ const addComment = async (req, res) => {
   }
 };
 
-//edit comment endpoint (CHECK PLS) -Frans
+//edit comment endpoint (Hit : 2)
 const editComment = async (req, res) => {
   let token = req.header("x-auth-token");
   if (token) {
@@ -271,7 +271,7 @@ const editComment = async (req, res) => {
   return res.status(400).send({ message: "Token is required but not found." });
 };
 
-//get Specific Comment Endpoint
+//get Specific Comment Endpoint (Hit : Blom)
 const getSpecificComment = async function(req, res){
   let token = req.header("x-auth-token");
   let {id_komentar} = req.body;
@@ -309,10 +309,12 @@ const getSpecificComment = async function(req, res){
     return res.status(400).send({message: "Unauthorized Token. Comment belongs to another user."}) 
   }
 
+
+
   return res.status(200).send({comment: commentGet});
 }
 
-//get all comments from post endpoint (CHECK PLS) -Frans
+//get all comments from post endpoint (Hit : 5)
 const getAllCommentsFromPost = async (req, res) => {
   let token = req.header("x-auth-token");
   if (token) {
@@ -350,7 +352,7 @@ const getAllCommentsFromPost = async (req, res) => {
   return res.status(400).send({ message: "Token is required but not found." });
 };
 
-// endpoint sort comment (silahkan di cek)
+// endpoint sort comment (Hit : 5)
 const getAllCommentFromPostWithSort = async function(req, res){
   let {id_post, type} = req.body;
   let token = req.header("x-auth-token");
@@ -409,6 +411,7 @@ const getAllCommentFromPostWithSort = async function(req, res){
   return res.status(200).send({comments: sortedComment});
 }
 
+//endpoint upload gif reaction (Hit : 5)
 const gifUpload = async function(req, res){
   const uploadGif = upload.single("gif_reaction");
   uploadGif(req, res, async function (err) {
@@ -469,6 +472,8 @@ const gifUpload = async function(req, res){
           id_comment: id_komentar
         }
       })
+      //charge API Hit
+      await hit_api(api_key,5);
       return res.status(200).send({message: "Berhasil mengupload gif"});
   });
 }
