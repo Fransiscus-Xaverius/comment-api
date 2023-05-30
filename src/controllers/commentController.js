@@ -37,6 +37,9 @@ const { isUserPost } = require("../controllers/postController");
 const comment = require("../models/comment");
 const { hit_api } = require('../controllers/userController');
 
+
+//===================HELPER FUNCTIONS======================
+
 //get Comment count
 async function getCommentCount() {
   const count = await comments.count();
@@ -117,6 +120,9 @@ async function getCommentWithSort(id_post, category, sort) {
   });
 }
 
+//=========================================================
+
+//FILTER FUNCTION
 async function profanityFilter(comment) {
   const config = {
     method: "POST",
@@ -134,6 +140,8 @@ async function profanityFilter(comment) {
   };
   return config;
 }
+
+//ENDPOINTS
 
 //add comment endpoint(CHECK PLS)
 const addComment = async (req, res) => {
@@ -263,6 +271,7 @@ const editComment = async (req, res) => {
   return res.status(400).send({ message: "Token is required but not found." });
 };
 
+//get Specific Comment Endpoint
 const getSpecificComment = async function(req, res){
   let token = req.header("x-auth-token");
   let {id_komentar} = req.body;
@@ -303,7 +312,7 @@ const getSpecificComment = async function(req, res){
   return res.status(200).send({comment: commentGet});
 }
 
-//get all comments from post (CHECK PLS) -Frans
+//get all comments from post endpoint (CHECK PLS) -Frans
 const getAllCommentsFromPost = async (req, res) => {
   let token = req.header("x-auth-token");
   if (token) {
