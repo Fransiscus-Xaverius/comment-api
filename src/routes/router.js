@@ -17,7 +17,8 @@ const { addComment, editComment, getAllCommentsFromPost, getSpecificComment, get
 router.post("/comment", addComment);
 router.put("/comment", editComment);
 router.post("/comment/like", likeComment);
-router.get("/comment", getSpecificComment);
+router.get("/comment", getAllCommentsFromPost);
+router.get("/comment/specific", getSpecificComment);
 router.get("/comment/sort", getAllCommentFromPostWithSort);
 router.delete("/comment", deleteComment);
 router.post("/comment/gif_reaction", gifUpload);
