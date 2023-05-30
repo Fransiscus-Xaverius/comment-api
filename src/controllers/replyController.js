@@ -89,7 +89,9 @@ const addReply = async (req, res) => {
             } else id = "R001";
             await replies.create({ id_reply: id, id_comment: id_comment, username: userData.nama, api_key: cariUser.api_key, reply: result.data.clean });
             //API Hit Charge
-            await hit_api(api_key,2);
+            if (await hit_api(api_key, 2) == null) {
+              return res.status(400).send({message: "Api_Hit tidak cukup"})
+            }
             return res.status(201).send({ message: "Berhasil menambahkan reply" });
           }
         }
@@ -135,7 +137,9 @@ const editReply = async (req, res) => {
             //update reply
             await replies.update({ reply: result.data.clean }, { where: { id_reply: id_reply } });
             //API Hit Charge
-            await hit_api(api_key,2);
+            if (await hit_api(api_key, 2) == null) {
+              return res.status(400).send({message: "Api_Hit tidak cukup"})
+            }
             res.status(201).send({ message: "Reply successfully updated" });
           }
         } catch (error) {
@@ -171,7 +175,9 @@ const deleteReply = async (req, res) => {
           //if like type==1, id_comment==id_reply
           await likes.destroy({ where: { jenis: 1, id_comment: id_reply } });
           //API Hit Charge
-          await hit_api(api_key,2);
+          if (await hit_api(api_key, 2) == null) {
+            return res.status(400).send({message: "Api_Hit tidak cukup"})
+          }
           return res.status(200).send({ message: "Reply successfully deleted" });
         } else res.status(404).send({ message: "Reply not found" });
       } catch (error) {
@@ -204,7 +210,9 @@ const deleteAllReply = async (req, res) => {
           //remove all likes related to those replies (0= comment 1=reply) (UNDONE)
           //   await likes.destroy({ where: { jenis:1, id_comment:   } });
           //API Hit Charge
-          await hit_api(api_key,5);
+          if (await hit_api(api_key, 5) == null) {
+            return res.status(400).send({message: "Api_Hit tidak cukup"})
+          }
           return res.status(201).send({ message: "All replies of this comment are successfully deleted!" });
         } else return res.status(404).send({ message: "Comment not found" });
       } catch (error) {
@@ -255,7 +263,9 @@ const likeReply = async (req, res) => {
             console.log(ambil.id_post);
             await likes.create({ id_like: id, id_comment: id_reply, id_post: ambil.id_post, username: username, jenis: 1 });
             //API Hit Charge
-            await hit_api(api_key,2);
+            if (await hit_api(api_key, 2) == null) {
+              return res.status(400).send({message: "Api_Hit tidak cukup"})
+            }
             res.status(201).send({ message: "Successfully liked this reply" });
           } else res.status(400).send({ message: "User has already liked this reply" });
         } else res.status(404).send({ message: "Reply not found" });
