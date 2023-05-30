@@ -26,7 +26,7 @@ function generateString(length) {
 }
 
 //api_hit function.
-async function hit_api(api_key, amount){
+async function hit_api(api_key, amount, res){
   let userdata = await users.findOne({
     where: {
       api_key:api_key,
@@ -48,7 +48,6 @@ async function hit_api(api_key, amount){
     return curhit;
   }
   else return null;
-
 }
 
 async function getUser(nama) {
@@ -68,6 +67,7 @@ const coba = (req, res) => {
 //register endpoint
 const register = async (req, res) => {
   let { nama, email, password, confirm_password } = req.body;
+  console.log(nama);
   //cek format email, password & conf dengan joi
   let schema = Joi.object({
     nama: Joi.string().required().messages({
@@ -82,9 +82,10 @@ const register = async (req, res) => {
       "any.required": "{{#label}} harus diisi",
       "string.empty": "{{#label}} tidak boleh blank",
     }),
-    confirm_password: Joi.string().equal(Joi.ref("password")).messages({
+    confirm_password: Joi.string().equal(Joi.ref("password")).required().messages({
       "any.required": "{{#label}} harus diisi",
       "string.empty": "{{#label}} tidak boleh blank",
+      "any.only": "{{#label}} harus sama dengan password",
     }),
   });
   try {
