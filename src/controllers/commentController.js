@@ -84,6 +84,21 @@ async function commentOwnedByUser(idComment, apiKeyUser){
   return hasil;
 }
 
+async function PostOwnedByUser(idPost, apiKeyUser){
+  let hasil = false;
+  let getPost = await posts.findOne({
+    where:{
+      id_post: idPost
+    }
+  });
+  if(getPost){
+    if(getPost.api_key == apiKeyUser){
+      hasil = true;
+    }
+  }
+  return hasil;
+}
+
 //generate comment ID
 async function generateCommentID() {
   let id = "C";
@@ -196,7 +211,9 @@ const addComment = async (req, res) => {
       };
 
       //API Hit Charge
-      await hit_api(api_key,2);
+      if (await hit_api(api_key, 2) == null) {
+        return res.status(400).send({message: "Api_Hit tidak cukup"})
+      }
 
       return res.status(201).send({ message: " Berhasil menambahkan komentar", data: temp });
     } else {
@@ -264,7 +281,9 @@ const editComment = async (req, res) => {
     };
 
     //charge API Hit
-    await hit_api(api_key,2);
+    if (await hit_api(api_key, 2) == null) {
+      return res.status(400).send({message: "Api_Hit tidak cukup"})
+    }
 
     return res.status(200).send({ message: "Berhasil update comment", data: data });
   } 
@@ -274,7 +293,7 @@ const editComment = async (req, res) => {
 //get Specific Comment Endpoint (Hit : Blom)
 const getSpecificComment = async function(req, res){
   let token = req.header("x-auth-token");
-  let {id_komentar} = req.body;
+  let {id_comment} = req.body;
 
   if(!req.header('x-auth-token')){
     return res.status(400).send({ message: "Token is required but not found."});
@@ -288,7 +307,7 @@ const getSpecificComment = async function(req, res){
   }
 
   let schema = Joi.object({
-    id_komentar: Joi.string().required().messages({
+    id_comment: Joi.string().required().messages({
       "any.required": "{{#label}} harus diisi",
       "string.empty": "{{#label}} tidak boleh blank",
     }),
@@ -300,7 +319,7 @@ const getSpecificComment = async function(req, res){
     return res.status(400).send({message: error.message});
   }
   
-  let commentGet = await getComment(id_komentar);
+  let commentGet = await getComment(id_comment);
   if (!commentGet) {
     return res.status(404).send({ message: "Comment not found."});
   }
@@ -308,8 +327,6 @@ const getSpecificComment = async function(req, res){
   if (commentGet.api_key != userdata.api_key) {
     return res.status(400).send({message: "Unauthorized Token. Comment belongs to another user."}) 
   }
-
-
 
   return res.status(200).send({comment: commentGet});
 }
@@ -345,7 +362,9 @@ const getAllCommentsFromPost = async (req, res) => {
     let foo = await getAllComments(id_post);
 
     //charge API hit
-    await hit_api(api_key,5);
+    if (await hit_api(api_key, 5) == null) {
+      return res.status(400).send({message: "Api_Hit tidak cukup"})
+    }
 
     return res.status(200).send({comments:foo});
   } 
@@ -384,6 +403,10 @@ const getAllCommentFromPostWithSort = async function(req, res){
     return res.status(400).send(error.message);
   }
 
+  if (!PostOwnedByUser(id_post, api_key)) {
+    return res.status(400).send({message: "Unauthorized Token. Post belongs to another user."})
+  }
+
   if (!type) {
     type = 0;
   }
@@ -406,7 +429,9 @@ const getAllCommentFromPostWithSort = async function(req, res){
   }
 
   //charge API Hit
-  await hit_api(api_key,5);
+  if (await hit_api(api_key, 5) == null) {
+    return res.status(400).send({message: "Api_Hit tidak cukup"})
+  }
 
   return res.status(200).send({comments: sortedComment});
 }
@@ -473,7 +498,9 @@ const gifUpload = async function(req, res){
         }
       })
       //charge API Hit
-      await hit_api(api_key,5);
+      if (await hit_api(api_key, 5) == null) {
+        return res.status(400).send({message: "Api_Hit tidak cukup"})
+      }
       return res.status(200).send({message: "Berhasil mengupload gif"});
   });
 }
