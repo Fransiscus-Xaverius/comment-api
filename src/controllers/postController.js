@@ -74,12 +74,14 @@ const addPost = async (req, res) => {
       //create new post with ORM
       await posts.create({id_post : id, api_key:api_key});
       
-      let curHit = await hit_api(api_key, 3);
+      //let curHit = await hit_api(api_key, 5, res);
 
       //API Hit Charge
-      await hit_api(api_key,5);
+      if (await hit_api(api_key, 5) == null) {
+        return res.status(400).send({message: "Api_Hit tidak cukup"})
+      }
 
-      return res.status(201).send({message:"New Post successfully added", id_post:id, API_HIT : curHit});
+      return res.status(201).send({message:"New Post successfully added", id_post:id});
     } else {
       //Unreachable statement, but here just in case a user is deleted but the token is still active.
       return res.status(400).send({ message: "User not registered" });
@@ -116,7 +118,9 @@ const getAllPost = async (req, res) => {
       }
 
       //API Hit Charge
-      await hit_api(api_key,10);
+      if (await hit_api(api_key, 10) == null) {
+        return res.status(400).send({message: "Api_Hit tidak cukup"})
+      }
 
       return res.status(200).send({
         username:cariUser.username,
