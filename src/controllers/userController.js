@@ -5,6 +5,7 @@ const sequelize = new Sequelize("db_proyekws", "root", "", {
   port: 3306,
   dialect: "mysql",
 });
+const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const JWT_KEY = process.env.JWT_KEY;
@@ -26,28 +27,27 @@ function generateString(length) {
 }
 
 //api_hit function.
-async function hit_api(api_key, amount, res){
+async function hit_api(api_key, amount, res) {
   let userdata = await users.findOne({
     where: {
-      api_key:api_key,
+      api_key: api_key,
     },
   });
 
   let curhit = userdata.api_hit;
-  
-  if(curhit>=amount) {
-    curhit-=amount;
+
+  if (curhit >= amount) {
+    curhit -= amount;
     users.update(
       {
-        api_hit:curhit
+        api_hit: curhit,
       },
       {
-        where:{ api_key: api_key }
+        where: { api_key: api_key },
       }
-    )
+    );
     return curhit;
-  }
-  else return null;
+  } else return null;
 }
 
 async function getUser(nama) {
@@ -108,7 +108,9 @@ const register = async (req, res) => {
     if (userGet.length > 0) {
       return res.status(400).send({ message: "Nama anda sudah digunakan" });
     } else {
-      let coba = await users.create({ nama: nama, email: email, password: password, api_key: apikey, api_hit: 10, saldo: 0, liked_comment: [] });
+      //hash password
+      let hashedPass = bcrypt.hashSync(password, 10);
+      let coba = await users.create({ nama: nama, email: email, password: hashedPass, api_key: apikey, api_hit: 10, saldo: 0, liked_comment: [] });
       let temp = {
         nama: nama,
         api_key: apikey,
@@ -140,7 +142,7 @@ const login = async (req, res) => {
     if (userGet.length == 0) {
       return res.status(404).send({ message: "User tidak ditemukan" });
     } else {
-      if (userGet[0].password != password) {
+      if (!bcrypt.compareSync(password, userGet[0].password)) {
         return res.status(400).send({ message: "Password salah" });
       } else {
         let token = jwt.sign(
@@ -307,4 +309,4 @@ const cekApiHit = async (req, res) => {
   }
 };
 
-module.exports = { coba, register, login, topupApiHit, topupSaldo, cekSaldo, cekApiHit , hit_api};
+module.exports = { coba, register, login, topupApiHit, topupSaldo, cekSaldo, cekApiHit, hit_api };
