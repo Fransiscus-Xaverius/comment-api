@@ -12,8 +12,8 @@ let JWT_KEY = process.env.JWT_KEY;
 const users = require("../models/user")(sequelize, DataTypes);
 const posts = require("../models/post")(sequelize, DataTypes);
 
-//module imports 
-const { hit_api } = require('../controllers/userController');
+//module imports
+const { hit_api } = require("../controllers/userController");
 
 //===================HELPER FUNCTIONS======================
 //generate new post functions
@@ -35,14 +35,14 @@ async function getPostCount() {
   return count;
 }
 
-async function getPost(id_post){
-  let tarPost = await posts.findOne({where:{id_post:id_post}, raw:true});
+async function getPost(id_post) {
+  let tarPost = await posts.findOne({ where: { id_post: id_post }, raw: true });
   return tarPost.api_key;
 }
 
-async function isUserPost(api_key, id_post){
+async function isUserPost(api_key, id_post) {
   let fuckthisshit = await getPost(id_post);
-  return fuckthisshit==api_key
+  return fuckthisshit == api_key;
 }
 //=========================================================
 
@@ -60,7 +60,7 @@ const addPost = async (req, res) => {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
       // return res.status(403).send("Unauthorized Token.");
-      return res.send(error.toString());
+      return res.send({ message: error.toString() });
     }
     //Search for current user who's registering a new post.
     cariUser = await users.findOne({ where: { nama: userdata.nama } });
@@ -72,16 +72,16 @@ const addPost = async (req, res) => {
       //get API key from token
       let api_key = userdata.api_key;
       //create new post with ORM
-      await posts.create({id_post : id, api_key:api_key});
-      
+      await posts.create({ id_post: id, api_key: api_key });
+
       //let curHit = await hit_api(api_key, 5, res);
 
       //API Hit Charge
-      if (await hit_api(api_key, 5) == null) {
-        return res.status(400).send({message: "Api_Hit tidak cukup"})
+      if ((await hit_api(api_key, 5)) == null) {
+        return res.status(400).send({ message: "Api_Hit tidak cukup" });
       }
 
-      return res.status(201).send({message:"New Post successfully added", id_post:id});
+      return res.status(201).send({ message: "New Post successfully added", id_post: id });
     } else {
       //Unreachable statement, but here just in case a user is deleted but the token is still active.
       return res.status(400).send({ message: "User not registered" });
@@ -92,51 +92,45 @@ const addPost = async (req, res) => {
 //get all post from user (Unchecked) (Hit : 10)
 const getAllPost = async (req, res) => {
   let token = req.header("x-auth-token");
-  if(token){
+  if (token) {
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(403).send("Unauthorized Token.");
+      return res.status(403).send({ message: "Unauthorized Token." });
     }
     //Search for current user who's registering a new post.
     cariUser = await users.findOne({ where: { nama: userdata.nama } });
 
     let allPosts = await posts.findAll({
       where: {
-        api_key: cariUser.api_key
-      }
-    })
+        api_key: cariUser.api_key,
+      },
+    });
 
     let foo = [];
-    
-    
 
-    if(allPosts){
+    if (allPosts) {
       for (let index = 0; index < allPosts.length; index++) {
         const element = allPosts[index];
         foo.push(element.id_post);
       }
 
       //API Hit Charge
-      if (await hit_api(api_key, 10) == null) {
-        return res.status(400).send({message: "Api_Hit tidak cukup"})
+      if ((await hit_api(api_key, 10)) == null) {
+        return res.status(400).send({ message: "Api_Hit tidak cukup" });
       }
 
       return res.status(200).send({
-        username:cariUser.username,
+        username: cariUser.username,
         api_key: cariUser.api_key,
-        Posts : foo
-      })
+        Posts: foo,
+      });
     }
     //safeguard incase of database error/deleted user with valid token
-    return res.status(400).send(
-      {
-        message:"Oops, something went wrong."
-      }
-    )
+    return res.status(400).send({
+      message: "Oops, something went wrong.",
+    });
+  } else res.status(400).send({ message: "Token is required but not found." });
+};
 
-  }
-  else res.status(400).send({ message: "Token is required but not found."});
-}
-
-module.exports = { addPost, getAllPost , isUserPost};
+module.exports = { addPost, getAllPost, isUserPost };

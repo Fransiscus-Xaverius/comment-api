@@ -17,8 +17,8 @@ const users = require("../models/user")(sequelize, DataTypes);
 const likes = require("../models/like")(sequelize, DataTypes);
 
 //import module
-const {generateLikeID} = require("../controllers/commentController");
-const { hit_api } = require('../controllers/userController');
+const { generateLikeID } = require("../controllers/commentController");
+const { hit_api } = require("../controllers/userController");
 
 //===================HELPER FUNCTIONS======================
 
@@ -79,7 +79,7 @@ const addReply = async (req, res) => {
           //filter for any potential harmful words
           const config = await profanityFilter(reply);
           let result = await axios.request(config);
-          if (!result) return res.status(400).send({ msg: "Something went wrong! please try again later. ERR CODE 001" });
+          if (!result) return res.status(400).send({ message: "Something went wrong! please try again later. ERR CODE 001" });
           else {
             //create a reply id
             let hitung = await replies.findAll();
@@ -89,19 +89,19 @@ const addReply = async (req, res) => {
             } else id = "R001";
             await replies.create({ id_reply: id, id_comment: id_comment, username: userData.nama, api_key: cariUser.api_key, reply: result.data.clean });
             //API Hit Charge
-            if (await hit_api(api_key, 2) == null) {
-              return res.status(400).send({message: "Api_Hit tidak cukup"})
+            if ((await hit_api(api_key, 2)) == null) {
+              return res.status(400).send({ message: "Api_Hit tidak cukup" });
             }
             return res.status(201).send({ message: "Berhasil menambahkan reply" });
           }
         }
       } catch (error) {
         return res.status(400).send({
-          error_message: error.message,
+          message: error.message,
         });
       }
     } catch (error) {
-      return res.status(400).send({ msg: "Something is wrong with the token" });
+      return res.status(400).send({ message: "Something is wrong with the token" });
     }
   } else res.status(400).send({ message: "Token is nowhere to be found.." });
 };
@@ -132,18 +132,18 @@ const editReply = async (req, res) => {
           //censor any offensive words
           const config = await profanityFilter(new_reply);
           let result = await axios.request(config);
-          if (!result) return res.status(400).send({ msg: "Something went wrong! please try again later. ERR CODE 001" });
+          if (!result) return res.status(400).send({ message: "Something went wrong! please try again later. ERR CODE 001" });
           else {
             //update reply
             await replies.update({ reply: result.data.clean }, { where: { id_reply: id_reply } });
             //API Hit Charge
-            if (await hit_api(api_key, 2) == null) {
-              return res.status(400).send({message: "Api_Hit tidak cukup"})
+            if ((await hit_api(api_key, 2)) == null) {
+              return res.status(400).send({ message: "Api_Hit tidak cukup" });
             }
             res.status(201).send({ message: "Reply successfully updated" });
           }
         } catch (error) {
-          return res.status(400).send(error.message);
+          return res.status(400).send({ message: error.message });
         }
       } else return res.status(404).send({ message: "Reply not found" });
     } catch (error) {
@@ -175,13 +175,13 @@ const deleteReply = async (req, res) => {
           //if like type==1, id_comment==id_reply
           await likes.destroy({ where: { jenis: 1, id_comment: id_reply } });
           //API Hit Charge
-          if (await hit_api(api_key, 2) == null) {
-            return res.status(400).send({message: "Api_Hit tidak cukup"})
+          if ((await hit_api(api_key, 2)) == null) {
+            return res.status(400).send({ message: "Api_Hit tidak cukup" });
           }
           return res.status(200).send({ message: "Reply successfully deleted" });
         } else res.status(404).send({ message: "Reply not found" });
       } catch (error) {
-        return res.status(400).send(error.message);
+        return res.status(400).send({ message: error.message });
       }
     } catch (error) {
       res.status(400).send({ message: "There's something wrong with the token" });
@@ -210,13 +210,13 @@ const deleteAllReply = async (req, res) => {
           //remove all likes related to those replies (0= comment 1=reply) (UNDONE)
           //   await likes.destroy({ where: { jenis:1, id_comment:   } });
           //API Hit Charge
-          if (await hit_api(api_key, 5) == null) {
-            return res.status(400).send({message: "Api_Hit tidak cukup"})
+          if ((await hit_api(api_key, 5)) == null) {
+            return res.status(400).send({ message: "Api_Hit tidak cukup" });
           }
           return res.status(201).send({ message: "All replies of this comment are successfully deleted!" });
         } else return res.status(404).send({ message: "Comment not found" });
       } catch (error) {
-        res.status(400).send(error.message);
+        res.status(400).send({ message: error.message });
       }
     } catch (error) {
       res.status(400).send({ message: "Something is wrong with the token" });
@@ -256,21 +256,21 @@ const likeReply = async (req, res) => {
             //   id = "L" + (parseInt(hitung[hitung.length - 1].dataValues.id_like.substring(1)) + 1);
             // } else id = "L1";
             let ambil = await comments.findOne({
-              where:{
-                id_comment: cari.id_comment
-              }
-            }); 
+              where: {
+                id_comment: cari.id_comment,
+              },
+            });
             console.log(ambil.id_post);
             await likes.create({ id_like: id, id_comment: id_reply, id_post: ambil.id_post, username: username, jenis: 1 });
             //API Hit Charge
-            if (await hit_api(api_key, 2) == null) {
-              return res.status(400).send({message: "Api_Hit tidak cukup"})
+            if ((await hit_api(api_key, 2)) == null) {
+              return res.status(400).send({ message: "Api_Hit tidak cukup" });
             }
             res.status(201).send({ message: "Successfully liked this reply" });
           } else res.status(400).send({ message: "User has already liked this reply" });
         } else res.status(404).send({ message: "Reply not found" });
       } catch (error) {
-        res.status(400).send(error.message);
+        res.status(400).send({ message: error.message });
       }
     } catch (error) {
       res.status(400).send({ message: "Something is wrong with the token" });

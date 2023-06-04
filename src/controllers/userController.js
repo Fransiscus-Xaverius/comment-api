@@ -118,7 +118,7 @@ const register = async (req, res) => {
       return res.status(201).send({ message: "Berhasil register", data: temp });
     }
   } catch (error) {
-    return res.status(400).send(error.message);
+    return res.status(400).send({ message: error.message });
   }
 };
 
@@ -159,7 +159,7 @@ const login = async (req, res) => {
       }
     }
   } catch (error) {
-    return res.status(400).send(error.toString());
+    return res.status(400).send({ message: error.message });
   }
 };
 
@@ -176,7 +176,7 @@ const topupApiHit = async (req, res) => {
   });
 
   if (!req.header("x-auth-token")) {
-    return res.status(403).send("Unauthorized");
+    return res.status(403).send({ message: "Unauthorized" });
   }
 
   let harga = parseInt(jumlah_api_hit) * 500;
@@ -186,10 +186,10 @@ const topupApiHit = async (req, res) => {
     let userdata = jwt.verify(token, JWT_KEY);
     let userGet = await getUser(userdata.nama);
     if (userGet.length == 0) {
-      return res.status(404).send("User Tidak ditemukan");
+      return res.status(404).send({ message: "User Tidak ditemukan" });
     }
     if (userGet[0].saldo < harga) {
-      return res.status(400).send("Saldo tidak mencukupi");
+      return res.status(400).send({ message: "Saldo tidak mencukupi" });
     }
     let new_api_hit = parseInt(userGet[0].api_hit) + parseInt(jumlah_api_hit);
     let new_saldo = parseInt(userGet[0].saldo) - parseInt(harga);
@@ -210,7 +210,7 @@ const topupApiHit = async (req, res) => {
       api_hit_sekarang: new_api_hit,
     });
   } catch (error) {
-    return res.status(400).send(error.toString());
+    return res.status(400).send({ message: error.message });
   }
 };
 
@@ -228,7 +228,7 @@ const topupSaldo = async (req, res) => {
   try {
     let res = await schema.validateAsync(req.body);
   } catch (error) {
-    return res.status(400).send(error.toString());
+    return res.status(400).send({ message: error.message });
   }
   try {
     let temp = jwt.verify(token, JWT_KEY);
