@@ -210,7 +210,7 @@ const topupApiHit = async (req, res) => {
       api_hit_sekarang: new_api_hit,
     });
   } catch (error) {
-    return res.status(400).send({ message: "Invalid token" });
+    return res.status(400).send({ message: error.message });
   }
 };
 
