@@ -71,20 +71,20 @@ const register = async (req, res) => {
   //cek format email, password & conf dengan joi
   let schema = Joi.object({
     nama: Joi.string().required().messages({
-      "any.required": "{{#label}} harus diisi",
-      "string.empty": "{{#label}} tidak boleh blank",
+      "any.required": "Semua Field Harus Diisi",
+      "string.empty": "Isi Field Tidak Boleh String Kosong",
     }),
     email: Joi.string().email().required().messages({
-      "any.required": "{{#label}} harus diisi",
-      "string.empty": "{{#label}} tidak boleh blank",
+      "any.required": "Semua Field Harus Diisi",
+      "string.empty": "Isi Field Tidak Boleh String Kosong",
     }),
     password: Joi.string().min(8).required().messages({
-      "any.required": "{{#label}} harus diisi",
-      "string.empty": "{{#label}} tidak boleh blank",
+      "any.required": "Semua Field Harus Diisi",
+      "string.empty": "Isi Field Tidak Boleh String Kosong",
     }),
     confirm_password: Joi.string().equal(Joi.ref("password")).required().messages({
-      "any.required": "{{#label}} harus diisi",
-      "string.empty": "{{#label}} tidak boleh blank",
+      "any.required": "Semua Field Harus Diisi",
+      "string.empty": "Isi Field Tidak Boleh String Kosong",
       "any.only": "{{#label}} harus sama dengan password",
     }),
   });
@@ -128,12 +128,12 @@ const login = async (req, res) => {
   let { nama, password } = req.body;
   let schema = Joi.object({
     nama: Joi.string().required().messages({
-      "any.required": "{{#label}} harus diisi",
-      "string.empty": "{{#label}} tidak boleh blank",
+      "any.required": "Semua Field Harus Diisi",
+      "string.empty": "Isi Field Tidak Boleh String Kosong",
     }),
     password: Joi.string().required().messages({
-      "any.required": "{{#label}} harus diisi",
-      "string.empty": "{{#label}} tidak boleh blank",
+      "any.required": "Semua Field Harus Diisi",
+      "string.empty": "Isi Field Tidak Boleh String Kosong",
     }),
   });
   try {
@@ -169,9 +169,9 @@ const topupApiHit = async (req, res) => {
   let { jumlah_api_hit } = req.body;
   let schema = Joi.object({
     jumlah_api_hit: Joi.number().integer().min(1).required().messages({
-      "any.required": "{{#label}} harus diisi",
-      "string.empty": "{{#label}} tidak boleh blank",
-      "number.min": "{{#label}} minimal 1",
+      "any.required": "Semua Field Harus Diisi",
+      "string.empty": "Isi Field Tidak Boleh String Kosong",
+      "number.min": "Jumlah api_hit minimal 1",
     }),
   });
 
@@ -210,7 +210,7 @@ const topupApiHit = async (req, res) => {
       api_hit_sekarang: new_api_hit,
     });
   } catch (error) {
-    return res.status(400).send({ message: error.message });
+    return res.status(400).send({ message: "Invalid token" });
   }
 };
 
@@ -220,9 +220,9 @@ const topupSaldo = async (req, res) => {
   let token = req.header("x-auth-token");
   let schema = Joi.object({
     nominal: Joi.number().integer().min(1000).required().messages({
-      "any.required": "{{#label}} harus diisi",
-      "string.empty": "{{#label}} tidak boleh blank",
-      "number.min": "{{#label}} topup minimal 1000",
+      "any.required": "Semua Field Harus Diisi",
+      "string.empty": "Isi Field Tidak Boleh String Kosong",
+      "number.min": "Nominal topup minimal 1000",
     }),
   });
   try {
