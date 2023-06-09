@@ -456,6 +456,18 @@ const gifUpload = async function (req, res) {
         "string.empty": "{{#label}} tidak boleh blank",
       }),
     });
+    
+    const gifValidator = Joi.object({
+      file: Joi.required().messages({
+        "any.required": "{{#label}} harus diisi",
+      }),
+    });
+  
+    try {
+      await gifValidator.validateAsync({ file: req.file });
+    } catch (error) {
+      return res.status(400).send(error.message);
+    }
 
     try {
       await schema.validateAsync(req.body);
