@@ -304,7 +304,7 @@ const editComment = async (req, res) => {
   }
 };
 
-//get Specific Comment Endpoint (Hit : Blom)
+//get Specific Comment Endpoint (Hit : 2)
 const getSpecificComment = async function (req, res) {
   let token = req.header("x-auth-token");
   let { id_comment } = req.body;
@@ -572,7 +572,7 @@ const gifUpload = async function (req, res) {
   });
 };
 
-//like comment endpoint
+//like comment endpoint (Hit : 2)
 const likeComment = async (req, res) => {
   let token = req.header("x-auth-token");
   let { id_comment, username } = req.body;
@@ -639,6 +639,10 @@ const likeComment = async (req, res) => {
                 },
               }
             );
+            let api_key = userdata.api_key;
+            if ((await hit_api(api_key, 2)) == null) {
+              return res.status(400).send({ message: "Api_Hit tidak cukup" });
+            }
             return res.status(200).send({ message: "Berhasil Like Komentar " + id_comment.toUpperCase() });
           } else {
             return res.status(400).send({ message: "Komentar sudah pernah dilike" });
@@ -654,7 +658,7 @@ const likeComment = async (req, res) => {
   return res.status(401).send({ message: "Token tidak ditemukan" });
 };
 
-//delete comment
+//delete comment (Hit : 2)
 const deleteComment = async (req, res) => {
   let token = req.header("x-auth-token");
   let { id_comment } = req.body;
@@ -705,6 +709,11 @@ const deleteComment = async (req, res) => {
           );
           //clear likes
 
+          let api_key = userdata.api_key;
+          if ((await hit_api(api_key, 2)) == null) {
+            return res.status(400).send({ message: "Api_Hit tidak cukup" });
+          }
+
           return res.status(200).send({ message: "Berhasil Menghapus Komentar " + id_comment.toUpperCase() });
         } else {
           return res.status(403).send({ message: "Can't delete. Comment milik user lain" });
@@ -716,7 +725,7 @@ const deleteComment = async (req, res) => {
   return res.status(401).send({ message: "Token tidak ditemukan" });
 };
 
-//delete all comment from post
+//delete all comment from post (Hit : 5)
 const deleteCommentFromPost = async (req, res) => {
   let token = req.header("x-auth-token");
   let { id_post } = req.body;
@@ -776,7 +785,10 @@ const deleteCommentFromPost = async (req, res) => {
             }
           );
           //clear likes
-
+          let api_key = userdata.api_key;
+          if ((await hit_api(api_key, 5)) == null) {
+            return res.status(400).send({ message: "Api_Hit tidak cukup" });
+          }
           return res.status(200).send({ message: "Berhasil Menghapus Semua Komentar Dari Post " + id_post.toUpperCase() });
         } else {
           return res.status(400).send({ message: "Can't delete. Post milik user lain" });
