@@ -27,7 +27,8 @@ function generateString(length) {
 }
 
 //api_hit function.
-async function hit_api(api_key, amount, res) {
+async function hit_api(api_key, amount) {
+  console.log(api_key);
   let userdata = await users.findOne({
     where: {
       api_key: api_key,
@@ -35,6 +36,7 @@ async function hit_api(api_key, amount, res) {
   });
 
   let curhit = userdata.api_hit;
+  
 
   if (curhit >= amount) {
     curhit -= amount;
@@ -81,6 +83,7 @@ const register = async (req, res) => {
     password: Joi.string().min(8).required().messages({
       "any.required": "Semua Field Harus Diisi",
       "string.empty": "Isi Field Tidak Boleh String Kosong",
+      "string.min": "Panjang password harus lebih dari sama dengan 8 karakter"
     }),
     confirm_password: Joi.string().equal(Joi.ref("password")).required().messages({
       "any.required": "Semua Field Harus Diisi",
@@ -90,6 +93,9 @@ const register = async (req, res) => {
   });
   try {
     let res1 = await schema.validateAsync(req.body);
+  } catch (error) {
+    return res.status(400).send({ message: error.message });
+  }
     let apikey, kembar;
     do {
       //generate api key random untuk primary key user
@@ -117,9 +123,7 @@ const register = async (req, res) => {
       };
       return res.status(201).send({ message: "Berhasil register", data: temp });
     }
-  } catch (error) {
-    return res.status(400).send({ message: error.message });
-  }
+  
 };
 
 //login endpoint
@@ -138,6 +142,9 @@ const login = async (req, res) => {
   });
   try {
     let res1 = await schema.validateAsync(req.body);
+  } catch (error) {
+    return res.status(400).send({ message: error.message });
+  }
     let userGet = await getUser(nama);
     if (userGet.length == 0) {
       return res.status(404).send({ message: "User tidak ditemukan" });
@@ -154,13 +161,12 @@ const login = async (req, res) => {
           { expiresIn: "24h" }
         );
         return res.status(201).send({
+          message: "Berhasil login",
           token: token,
         });
       }
     }
-  } catch (error) {
-    return res.status(400).send({ message: error.message });
-  }
+  
 };
 
 //Top up API Hit endpoint
@@ -170,23 +176,33 @@ const topupApiHit = async (req, res) => {
   let schema = Joi.object({
     jumlah_api_hit: Joi.number().integer().min(1).required().messages({
       "any.required": "Semua Field Harus Diisi",
-      "string.empty": "Isi Field Tidak Boleh String Kosong",
+      "number.base": "{{#label}} Harus Berupa Angka",
       "number.min": "Jumlah api_hit minimal 1",
     }),
   });
 
   if (!req.header("x-auth-token")) {
-    return res.status(403).send({ message: "Unauthorized" });
+    return res.status(401).send({ message: "Token tidak ditemukan" });
   }
 
   let harga = parseInt(jumlah_api_hit) * 500;
 
   try {
-    let res1 = await schema.validateAsync(req.body);
-    let userdata = jwt.verify(token, JWT_KEY);
+    await schema.validateAsync(req.body);
+  } catch (error) {
+    return res.status(400).send({ message: error.message });
+  }
+
+  let userdata;
+  try {
+    userdata = jwt.verify(token, JWT_KEY);
+  } catch (error) {
+    return res.status(401).send({ message: "Token tidak valid" });
+  }
+
     let userGet = await getUser(userdata.nama);
     if (userGet.length == 0) {
-      return res.status(404).send({ message: "User Tidak ditemukan" });
+      return res.status(401).send({ message: "Token tidak valid" });
     }
     if (userGet[0].saldo < harga) {
       return res.status(400).send({ message: "Saldo tidak mencukupi" });
@@ -209,19 +225,21 @@ const topupApiHit = async (req, res) => {
       message: "Berhasil menambahkan api_hit",
       api_hit_sekarang: new_api_hit,
     });
-  } catch (error) {
-    return res.status(400).send({ message: error.message });
-  }
 };
 
 //Top up saldo endpoint
 const topupSaldo = async (req, res) => {
   let { nominal } = req.body;
   let token = req.header("x-auth-token");
+
+  if (!req.header("x-auth-token")) {
+    return res.status(401).send({ message: "Token tidak ditemukan" });
+  }
+
   let schema = Joi.object({
     nominal: Joi.number().integer().min(1000).required().messages({
       "any.required": "Semua Field Harus Diisi",
-      "string.empty": "Isi Field Tidak Boleh String Kosong",
+      "number.base": "{{#label}} Harus Berupa Angka",
       "number.min": "Nominal topup minimal 1000",
     }),
   });
@@ -230,15 +248,24 @@ const topupSaldo = async (req, res) => {
   } catch (error) {
     return res.status(400).send({ message: error.message });
   }
+
+  let temp;
   try {
-    let temp = jwt.verify(token, JWT_KEY);
+    temp = jwt.verify(token, JWT_KEY);
+  } catch (error) {
+    return res.status(401).send({ message: "Token tidak valid" });
+  }
+
     let user = await users.findAll({
       where: {
         nama: temp.nama,
       },
     });
-    if (user.length > 0) {
-      let saldoAwal = parseInt(user[0].saldo);
+    if (user.length == 0) {
+      return res.status(401).send({ message: "Token tidak valid" });
+    }
+
+    let saldoAwal = parseInt(user[0].saldo);
       let saldoAkhir = saldoAwal + parseInt(nominal);
       await users.update(
         {
@@ -254,59 +281,66 @@ const topupSaldo = async (req, res) => {
         message: "Berhasil Topup sebesar Rp " + nominal,
         saldo: "Rp " + saldoAkhir,
       });
-    } else {
-      return res.status(400).send({ message: "Invalid token" });
-    }
-  } catch (error) {
-    return res.status(400).send({ message: "Invalid token" });
-  }
 };
 
 //Cek Saldo endpoint
 const cekSaldo = async (req, res) => {
   let token = req.header("x-auth-token");
+
+  if (!req.header("x-auth-token")) {
+    return res.status(401).send({ message: "Token tidak ditemukan" });
+  }
+
+  let temp;
   try {
-    let temp = jwt.verify(token, JWT_KEY);
+    temp = jwt.verify(token, JWT_KEY);
+  } catch (error) {
+    return res.status(400).send({ message: "Token tidak valid" });
+  }
+
     let user = await users.findAll({
       where: {
         nama: temp.nama,
       },
     });
-    if (user.length > 0) {
+    if (user.length == 0) {
+      return res.status(400).send({ message: "Token tidak valid" });
+    }
       let saldo = parseInt(user[0].saldo);
       return res.status(200).send({
+        nama: user[0].nama,
         message: "Saldo saat ini sebesar Rp " + saldo,
       });
-    } else {
-      return res.status(400).send({ message: "Invalid token" });
-    }
-  } catch (error) {
-    return res.status(400).send({ message: "Invalid token" });
-  }
 };
 
 //Cek API Hit endpoint
 const cekApiHit = async (req, res) => {
   let token = req.header("x-auth-token");
+
+  if (!req.header("x-auth-token")) {
+    return res.status(401).send({ message: "Token tidak ditemukan" });
+  }
+
+  let temp;
   try {
-    let temp = jwt.verify(token, JWT_KEY);
+    temp = jwt.verify(token, JWT_KEY);
+  } catch (error) {
+    return res.status(400).send({ message: "Token tidak valid" });
+  }
+
     let user = await users.findAll({
       where: {
         nama: temp.nama,
       },
     });
-    if (user.length > 0) {
+    if (user.length == 0) {
+      return res.status(400).send({ message: "Token tidak valid" });
+    }
       let api_hit = parseInt(user[0].api_hit);
       return res.status(200).send({
         nama: user[0].nama,
-        api_hit: api_hit,
+        api_hit: "Api_Hit saat ini sebesar " + api_hit,
       });
-    } else {
-      return res.status(400).send({ message: "Invalid token" });
-    }
-  } catch (error) {
-    return res.status(400).send({ message: "Invalid token" });
-  }
 };
 
 module.exports = { coba, register, login, topupApiHit, topupSaldo, cekSaldo, cekApiHit, hit_api };
