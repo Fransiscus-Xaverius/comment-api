@@ -779,13 +779,13 @@ const deleteCommentFromPost = async (req, res) => {
 
           return res.status(200).send({ message: "Berhasil Menghapus Semua Komentar Dari Post " + id_post.toUpperCase() });
         } else {
-          return res.status(400).send({ message: "Can't delete. Post milik user lain" });
+          return res.status(403).send({ message: "Can't delete. Post milik user lain" });
         }
       } else {
         return res.status(404).send({ message: "Post tidak ditemukan" });
       }
   }
-  return res.status(400).send({ message: "Token tidak ditemukan" });
+  return res.status(401).send({ message: "Token tidak ditemukan" });
 };
 
 module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, getAllCommentFromPostWithSort, gifUpload, likeComment, deleteComment, deleteCommentFromPost, generateLikeID };
