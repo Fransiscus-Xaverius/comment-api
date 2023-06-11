@@ -63,12 +63,12 @@ const addReply = async (req, res) => {
       let cariUser = await users.findOne({ where: { nama: userData.nama } });
       let schema = Joi.object({
         reply: Joi.string().required().messages({
-          "any.required": "{{#label}} harus diisi",
-          "string.empty": "{{#label}} tidak boleh blank",
+          "any.required": "Semua Field Harus Diisi",
+          "string.empty": "Isi Field Tidak Boleh String Kosong",
         }),
         id_comment: Joi.string().required().messages({
-          "any.required": "{{#label}} harus diisi",
-          "string.empty": "{{#label}} tidak boleh blank",
+          "any.required": "Semua Field Harus Diisi",
+          "string.empty": "Isi Field Tidak Boleh String Kosong",
         }),
       });
       try {
@@ -87,9 +87,23 @@ const addReply = async (req, res) => {
             if (hitung.length > 0) {
               id = "R" + (hitung.length + 1).toString().padStart(3, 0);
             } else id = "R001";
+            let repliesCount = await comments.findAll({
+              where: {
+                id_comment: id_comment
+              }
+            })
             await replies.create({ id_reply: id, id_comment: id_comment, username: userData.nama, api_key: cariUser.api_key, reply: result.data.clean });
+            let jmlReplyAwal = parseInt(repliesCount[0].reply_count);
+            let jmlReplyBaru = jmlReplyAwal + 1;
+            await comments.update({
+              reply_count: jmlReplyBaru
+            },{
+              where:{
+                id_comment: id_comment,
+              }
+            });
             //API Hit Charge
-            let api_key = userdata.api_key;
+            let api_key = userData.api_key;
             if ((await hit_api(api_key, 2)) == null) {
               return res.status(400).send({ message: "Api_Hit tidak cukup" });
             }
@@ -120,12 +134,12 @@ const editReply = async (req, res) => {
         //joi validation
         let schema = Joi.object({
           id_reply: Joi.string().required().messages({
-            "any.required": "{{#label}} harus diisi",
-            "string.empty": "{{#label}} tidak boleh blank",
+            "any.required": "Semua Field Harus Diisi",
+            "string.empty": "Isi Field Tidak Boleh String Kosong",
           }),
           new_reply: Joi.string().required().messages({
-            "any.required": "{{#label}} harus diisi",
-            "string.empty": "{{#label}} tidak boleh blank",
+            "any.required": "Semua Field Harus Diisi",
+            "string.empty": "Isi Field Tidak Boleh String Kosong",
           }),
         });
         try {
@@ -138,7 +152,7 @@ const editReply = async (req, res) => {
             //update reply
             await replies.update({ reply: result.data.clean }, { where: { id_reply: id_reply } });
             //API Hit Charge
-            let api_key = userdata.api_key;
+            let api_key = userData.api_key;
             if ((await hit_api(api_key, 2)) == null) {
               return res.status(400).send({ message: "Api_Hit tidak cukup" });
             }
@@ -163,8 +177,8 @@ const deleteReply = async (req, res) => {
       let userData = jwt.verify(token, JWT_KEY);
       let schema = Joi.object({
         id_reply: Joi.string().required().messages({
-          "any.required": "{{#label}} harus diisi",
-          "string.empty": "{{#label}} tidak boleh blank",
+          "any.required": "Semua Field Harus Diisi",
+          "string.empty": "Isi Field Tidak Boleh String Kosong",
         }),
       });
       try {
@@ -177,7 +191,7 @@ const deleteReply = async (req, res) => {
           //if like type==1, id_comment==id_reply
           await likes.destroy({ where: { jenis: 1, id_comment: id_reply } });
           //API Hit Charge
-          let api_key = userdata.api_key;
+          let api_key = userData.api_key;
           if ((await hit_api(api_key, 2)) == null) {
             return res.status(400).send({ message: "Api_Hit tidak cukup" });
           }
@@ -201,8 +215,8 @@ const deleteAllReply = async (req, res) => {
       let userData = jwt.verify(token, JWT_KEY);
       let schema = Joi.object({
         id_comment: Joi.string().required().messages({
-          "any.required": "{{#label}} harus diisi",
-          "string.empty": "{{#label}} tidak boleh blank",
+          "any.required": "Semua Field Harus Diisi",
+          "string.empty": "Isi Field Tidak Boleh String Kosong",
         }),
       });
       try {
@@ -213,7 +227,7 @@ const deleteAllReply = async (req, res) => {
           //remove all likes related to those replies (0= comment 1=reply) (UNDONE)
           //   await likes.destroy({ where: { jenis:1, id_comment:   } });
           //API Hit Charge
-          let api_key = userdata.api_key;
+          let api_key = userData.api_key;
           if ((await hit_api(api_key, 5)) == null) {
             return res.status(400).send({ message: "Api_Hit tidak cukup" });
           }
@@ -238,12 +252,12 @@ const likeReply = async (req, res) => {
       let cariUser = await users.findOne({ where: { nama: userData.nama } });
       let schema = Joi.object({
         id_reply: Joi.string().required().messages({
-          "any.required": "{{#label}} harus diisi",
-          "string.empty": "{{#label}} tidak boleh blank",
+          "any.required": "Semua Field Harus Diisi",
+          "string.empty": "Isi Field Tidak Boleh String Kosong",
         }),
         username: Joi.string().required().messages({
-          "any.required": "{{#label}} harus diisi",
-          "string.empty": "{{#label}} tidak boleh blank",
+          "any.required": "Semua Field Harus Diisi",
+          "string.empty": "Isi Field Tidak Boleh String Kosong",
         }),
       });
       try {
@@ -267,7 +281,7 @@ const likeReply = async (req, res) => {
             console.log(ambil.id_post);
             await likes.create({ id_like: id, id_comment: id_reply, id_post: ambil.id_post, username: username, jenis: 1 });
             //API Hit Charge
-            let api_key = userdata.api_key;
+            let api_key = userData.api_key;
             if ((await hit_api(api_key, 2)) == null) {
               return res.status(400).send({ message: "Api_Hit tidak cukup" });
             }
