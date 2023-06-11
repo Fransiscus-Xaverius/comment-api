@@ -55,15 +55,14 @@ const addPost = async (req, res) => {
   if (token) {
     let userdata = "";
     let cariUser;
-
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      // return res.status(403).send("Unauthorized Token.");
-      return res.send({ message: error.toString() });
+      return res.status(401).send({message: "Token tidak valid"});
+      // return res.send({ message: error.toString() });
     }
     //Search for current user who's registering a new post.
-    cariUser = await users.findOne({ where: { nama: userdata.nama } });
+    cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
     //if current user exists, make post and return id_post
 
     if (cariUser) {
@@ -84,22 +83,26 @@ const addPost = async (req, res) => {
       return res.status(201).send({ message: "New Post successfully added", id_post: id });
     } else {
       //Unreachable statement, but here just in case a user is deleted but the token is still active.
-      return res.status(400).send({ message: "User not registered" });
+      return res.status(401).send({ message: "Token tidak valid" });
     }
-  } else res.status(400).send({ message: "Token is required but not found." });
+  } else res.status(401).send({ message: "Token tidak ditemukan" });
 };
 
 //get all post from user (Unchecked) (Hit : 10)
 const getAllPost = async (req, res) => {
   let token = req.header("x-auth-token");
   if (token) {
+    let userdata = "";
+    let cariUser;
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(403).send({ message: "Unauthorized Token." });
+      return res.status(401).send({message: "Token tidak valid"});
     }
-    //Search for current user who's registering a new post.
-    cariUser = await users.findOne({ where: { nama: userdata.nama } });
+    cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
+    if (!cariUser) {
+      return res.status(401).send({ message: "Token tidak valid" });
+    }
 
     let allPosts = await posts.findAll({
       where: {
@@ -131,7 +134,7 @@ const getAllPost = async (req, res) => {
     return res.status(400).send({
       message: "Oops, something went wrong.",
     });
-  } else res.status(400).send({ message: "Token is required but not found." });
+  } else res.status(401).send({ message: "Token tidak ditemukan" });
 };
 
 module.exports = { addPost, getAllPost, isUserPost };
