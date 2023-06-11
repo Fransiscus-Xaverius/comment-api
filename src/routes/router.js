@@ -17,9 +17,7 @@ const { addComment, editComment, getAllCommentsFromPost, getSpecificComment, get
 router.post("/comment", addComment);
 router.put("/comment", editComment);
 router.post("/comment/like", likeComment);
-router.get("/comment", getAllCommentsFromPost);
 router.get("/comment/specific", getSpecificComment);
-router.get("/comment/sort", getAllCommentFromPostWithSort);
 router.delete("/comment", deleteComment);
 router.post("/comment/gif_reaction", gifUpload);
 
@@ -38,6 +36,7 @@ const { addPost, getAllPost } = require("../controllers/postController");
 router.post("/post", addPost);
 router.get("/post/all", getAllPost);
 router.get("/post/comments", getAllCommentsFromPost);
+router.get("/post/sortComment", getAllCommentFromPostWithSort);
 router.delete("/post/comments", deleteCommentFromPost);
 
 module.exports = router;
