@@ -295,7 +295,7 @@ const cekSaldo = async (req, res) => {
   try {
     temp = jwt.verify(token, JWT_KEY);
   } catch (error) {
-    return res.status(400).send({ message: "Token tidak valid" });
+    return res.status(401).send({ message: "Token tidak valid" });
   }
 
     let user = await users.findAll({
@@ -304,7 +304,7 @@ const cekSaldo = async (req, res) => {
       },
     });
     if (user.length == 0) {
-      return res.status(400).send({ message: "Token tidak valid" });
+      return res.status(401).send({ message: "Token tidak valid" });
     }
       let saldo = parseInt(user[0].saldo);
       return res.status(200).send({
@@ -325,7 +325,7 @@ const cekApiHit = async (req, res) => {
   try {
     temp = jwt.verify(token, JWT_KEY);
   } catch (error) {
-    return res.status(400).send({ message: "Token tidak valid" });
+    return res.status(401).send({ message: "Token tidak valid" });
   }
 
     let user = await users.findAll({
@@ -334,7 +334,7 @@ const cekApiHit = async (req, res) => {
       },
     });
     if (user.length == 0) {
-      return res.status(400).send({ message: "Token tidak valid" });
+      return res.status(401).send({ message: "Token tidak valid" });
     }
       let api_hit = parseInt(user[0].api_hit);
       return res.status(200).send({
