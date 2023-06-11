@@ -116,6 +116,7 @@ const getAllPost = async (req, res) => {
       }
 
       //API Hit Charge
+      let api_key = userdata.api_key;
       if ((await hit_api(api_key, 10)) == null) {
         return res.status(400).send({ message: "Api_Hit tidak cukup" });
       }
