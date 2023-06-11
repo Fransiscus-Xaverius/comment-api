@@ -600,7 +600,7 @@ const likeComment = async (req, res) => {
     } catch (error) {
       return res.status(401).send({message: "Token tidak valid"});
     }
-    cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
+    cariUser = await users.findOne({ where: { api_key: temp.api_key } });
     if (!cariUser) {
       return res.status(401).send({ message: "Token tidak valid" });
     }
