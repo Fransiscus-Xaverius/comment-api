@@ -383,7 +383,7 @@ const getAllCommentsFromPost = async (req, res) => {
     try {
       await schema.validateAsync(req.body);
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      return res.status(400).send({ message: error.message });
     }
 
     let id_post = req.body.id_post;
