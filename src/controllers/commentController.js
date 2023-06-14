@@ -388,7 +388,7 @@ const getAllCommentsFromPost = async (req, res) => {
 
     let id_post = req.body.id_post;
     let postGet = await posts.findOne({ where: { id_post: id_post } });
-    if (postGet.length == 0) {
+    if (!postGet) {
       return res.status(404).send({ message: "Post tidak ditemukan" });
     }
     let isuserpost = await isUserPost(api_key, id_post);
