@@ -1,7 +1,8 @@
 require("dotenv").config();
 const { Sequelize, DataTypes } = require("sequelize");
-const sequelize = new Sequelize("db_proyekws", "root", "", {
-  host: "localhost",
+const {development} = require("../config/config.json");
+const sequelize = new Sequelize(development.database, development.username, development.password, {
+  host: development.host,
   port: 3306,
   dialect: "mysql",
 });
