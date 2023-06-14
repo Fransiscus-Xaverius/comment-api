@@ -58,7 +58,7 @@ const addPost = async (req, res) => {
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(401).send({message: "Token tidak valid"});
+      return res.status(401).send({ message: "Token tidak valid" });
       // return res.send({ message: error.toString() });
     }
     //Search for current user who's registering a new post.
@@ -97,7 +97,7 @@ const getAllPost = async (req, res) => {
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(401).send({message: "Token tidak valid"});
+      return res.status(401).send({ message: "Token tidak valid" });
     }
     cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
     if (!cariUser) {
@@ -120,7 +120,7 @@ const getAllPost = async (req, res) => {
 
       //API Hit Charge
       let api_key = userdata.api_key;
-      if ((await hit_api(api_key, 10)) == null) {
+      if ((await hit_api(cariUser.api_key, 10)) == null) {
         return res.status(400).send({ message: "Api_Hit tidak cukup" });
       }
 

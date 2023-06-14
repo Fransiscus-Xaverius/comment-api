@@ -54,7 +54,7 @@ async function getAllComments(id_post) {
   return comments.findAll({
     where: {
       id_post: id_post,
-      status: 1
+      status: 1,
     },
   });
 }
@@ -131,7 +131,7 @@ async function getCommentWithSort(id_post, category, sort) {
   return comments.findAll({
     where: {
       id_post: id_post,
-      status: 1
+      status: 1,
     },
     order: [[`${category}`, `${sort}`]],
   });
@@ -169,7 +169,7 @@ const addComment = async (req, res) => {
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(401).send({message: "Token tidak valid"});
+      return res.status(401).send({ message: "Token tidak valid" });
     }
     cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
     if (!cariUser) {
@@ -202,7 +202,7 @@ const addComment = async (req, res) => {
     let id_post = req.body.id_post;
     let postGet = await posts.findAll({ where: { id_post: id_post } });
     if (postGet.length == 0) {
-      return res.status(404).send({message: "Post tidak ditemukan"});
+      return res.status(404).send({ message: "Post tidak ditemukan" });
     }
     let isuserpost = await isUserPost(api_key, id_post);
     console.log(api_key);
@@ -242,7 +242,7 @@ const editComment = async (req, res) => {
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(401).send({message: "Token tidak valid"});
+      return res.status(401).send({ message: "Token tidak valid" });
     }
     cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
     if (!cariUser) {
@@ -314,16 +314,16 @@ const getSpecificComment = async function (req, res) {
   }
 
   let userdata = "";
-    let cariUser;
-    try {
-      userdata = jwt.verify(token, JWT_KEY);
-    } catch (error) {
-      return res.status(401).send({message: "Token tidak valid"});
-    }
-    cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
-    if (!cariUser) {
-      return res.status(401).send({ message: "Token tidak valid" });
-    }
+  let cariUser;
+  try {
+    userdata = jwt.verify(token, JWT_KEY);
+  } catch (error) {
+    return res.status(401).send({ message: "Token tidak valid" });
+  }
+  cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
+  if (!cariUser) {
+    return res.status(401).send({ message: "Token tidak valid" });
+  }
 
   let schema = Joi.object({
     id_comment: Joi.string().required().messages({
@@ -364,7 +364,7 @@ const getAllCommentsFromPost = async (req, res) => {
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(401).send({message: "Token tidak valid"});
+      return res.status(401).send({ message: "Token tidak valid" });
     }
     cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
     if (!cariUser) {
@@ -389,7 +389,7 @@ const getAllCommentsFromPost = async (req, res) => {
     let id_post = req.body.id_post;
     let postGet = await posts.findOne({ where: { id_post: id_post } });
     if (postGet.length == 0) {
-      return res.status(404).send({message: "Post tidak ditemukan"});
+      return res.status(404).send({ message: "Post tidak ditemukan" });
     }
     let isuserpost = await isUserPost(api_key, id_post);
     console.log(api_key);
@@ -401,7 +401,7 @@ const getAllCommentsFromPost = async (req, res) => {
     if ((await hit_api(api_key, 5)) == null) {
       return res.status(400).send({ message: "Api_Hit tidak cukup" });
     }
-
+    console.log(foo.length);
     return res.status(200).send({ comments: foo });
   }
   return res.status(401).send({ message: "Token tidak ditemukan" });
@@ -417,16 +417,16 @@ const getAllCommentFromPostWithSort = async function (req, res) {
   }
 
   let userdata = "";
-    let cariUser;
-    try {
-      userdata = jwt.verify(token, JWT_KEY);
-    } catch (error) {
-      return res.status(401).send({message: "Token tidak valid"});
-    }
-    cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
-    if (!cariUser) {
-      return res.status(401).send({ message: "Token tidak valid" });
-    }
+  let cariUser;
+  try {
+    userdata = jwt.verify(token, JWT_KEY);
+  } catch (error) {
+    return res.status(401).send({ message: "Token tidak valid" });
+  }
+  cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
+  if (!cariUser) {
+    return res.status(401).send({ message: "Token tidak valid" });
+  }
 
   let api_key = userdata.api_key;
 
@@ -446,7 +446,7 @@ const getAllCommentFromPostWithSort = async function (req, res) {
 
   let postGet = await posts.findOne({ where: { id_post: id_post } });
   if (postGet.length == 0) {
-    return res.status(404).send({message: "Post tidak ditemukan"});
+    return res.status(404).send({ message: "Post tidak ditemukan" });
   }
 
   if (!PostOwnedByUser(id_post, api_key)) {
@@ -468,7 +468,7 @@ const getAllCommentFromPostWithSort = async function (req, res) {
     sortedComment = await getCommentWithSort(id_post, "reply_count", "DESC");
   } else if (type == 0) {
     sortedComment = await getAllComments(id_post);
-  } else{
+  } else {
     return res.status(400).send({ message: "type tidak valid" });
   }
 
@@ -484,11 +484,18 @@ const getAllCommentFromPostWithSort = async function (req, res) {
 const gifUpload = async function (req, res) {
   const uploadGif = upload.single("gif_reaction");
   uploadGif(req, res, async function (err) {
+    if (err) {
+      return res.status(400).send({ message: err.message });
+    }
+
     console.log(req.body);
+    console.log(req.file.filename);
+
     let { id_komentar } = req.body;
     let token = req.header("x-auth-token");
 
     if (!req.header("x-auth-token")) {
+      fs.unlinkSync(`./uploads/${req.file.filename}`);
       return res.status(401).send({ message: "Token tidak ditemukan" });
     }
 
@@ -497,10 +504,12 @@ const gifUpload = async function (req, res) {
     try {
       userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(401).send({message: "Token tidak valid"});
+      fs.unlinkSync(`./uploads/${req.file.filename}`);
+      return res.status(401).send({ message: "Token tidak valid" });
     }
     cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
     if (!cariUser) {
+      fs.unlinkSync(`./uploads/${req.file.filename}`);
       return res.status(401).send({ message: "Token tidak valid" });
     }
 
@@ -510,38 +519,50 @@ const gifUpload = async function (req, res) {
         "string.empty": "Isi Field Tidak Boleh String Kosong",
       }),
     });
-    
+
     const gifValidator = Joi.object({
       file: Joi.required().messages({
         "any.required": "Semua Field Harus Diisi",
       }),
     });
-  
+
     try {
       await gifValidator.validateAsync({ file: req.file });
     } catch (error) {
+      fs.unlinkSync(`./uploads/${req.file.filename}`);
       return res.status(400).send(error.message);
     }
 
     try {
       await schema.validateAsync(req.body);
     } catch (error) {
+      fs.unlinkSync(`./uploads/${req.file.filename}`);
       return res.status(400).send({ message: error.message });
     }
+
     let gif = [];
     let commentGet = await getComment(id_komentar);
-    let gif2 = JSON.parse(getComment.gif_reaction);
+    if (!commentGet) {
+      fs.unlinkSync(`./uploads/${req.file.filename}`);
+      return res.status(404).send({ message: "Comment tidak ditemukan" });
+    }
+    let gif2 = JSON.parse(commentGet.gif_reaction);
 
     for (let i = 0; i < gif2.length; i++) {
       gif.push(gif2[i]);
     }
     console.log(gif);
 
-    if (commentGet.length == 0) {
-      return res.status(404).send({ message: "Comment tidak ditemukan" });
-    }
     if (commentGet.api_key != userdata.api_key) {
+      fs.unlinkSync(`./uploads/${req.file.filename}`);
       return res.status(403).send({ message: "Unauthorized Token. Comment milik user lain" });
+    }
+
+    //charge API Hit
+    let api_key = userdata.api_key;
+    if ((await hit_api(api_key, 5)) == null) {
+      fs.unlinkSync(`./uploads/${req.file.filename}`);
+      return res.status(400).send({ message: "Api_Hit tidak cukup" });
     }
 
     let urutan = parseInt(gif.length) + 1;
@@ -563,11 +584,6 @@ const gifUpload = async function (req, res) {
         },
       }
     );
-    //charge API Hit
-    let api_key = userdata.api_key;
-    if ((await hit_api(api_key, 5)) == null) {
-      return res.status(400).send({ message: "Api_Hit tidak cukup" });
-    }
     return res.status(200).send({ message: "Berhasil mengupload gif" });
   });
 };
@@ -598,62 +614,61 @@ const likeComment = async (req, res) => {
     try {
       temp = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(401).send({message: "Token tidak valid"});
+      return res.status(401).send({ message: "Token tidak valid" });
     }
     cariUser = await users.findOne({ where: { api_key: temp.api_key } });
     if (!cariUser) {
       return res.status(401).send({ message: "Token tidak valid" });
     }
 
-      let getComm = await comments.findAll({
-        where: {
-          id_comment: id_comment,
-          status: 1,
-        },
-      });
-      if (getComm.length > 0) {
-        //comment ada
-        let idUser = temp.api_key;
-        if (await commentOwnedByUser(id_comment, idUser)) {
-          let alreadyLike = await likes.findOne({ where: { jenis: 0, username: username, id_comment: id_comment } });
-          if (!alreadyLike) {
-            //like pertama kali
-            let idBaru = await generateLikeID();
-            await likes.create({
-              id_like: idBaru,
-              id_comment: id_comment,
-              id_post: getComm[0].id_post,
-              username: username,
-              jenis: 0,
-            });
-            //tambah jumlah like
-            let jmlLikeAwal = parseInt(getComm[0].like_count);
-            let jmlLikeBaru = jmlLikeAwal + 1;
-            await comments.update(
-              {
-                like_count: jmlLikeBaru,
+    let getComm = await comments.findAll({
+      where: {
+        id_comment: id_comment,
+        status: 1,
+      },
+    });
+    if (getComm.length > 0) {
+      //comment ada
+      let idUser = temp.api_key;
+      if (await commentOwnedByUser(id_comment, idUser)) {
+        let alreadyLike = await likes.findOne({ where: { jenis: 0, username: username, id_comment: id_comment } });
+        if (!alreadyLike) {
+          //like pertama kali
+          let idBaru = await generateLikeID();
+          await likes.create({
+            id_like: idBaru,
+            id_comment: id_comment,
+            id_post: getComm[0].id_post,
+            username: username,
+            jenis: 0,
+          });
+          //tambah jumlah like
+          let jmlLikeAwal = parseInt(getComm[0].like_count);
+          let jmlLikeBaru = jmlLikeAwal + 1;
+          await comments.update(
+            {
+              like_count: jmlLikeBaru,
+            },
+            {
+              where: {
+                id_comment: id_comment,
               },
-              {
-                where: {
-                  id_comment: id_comment,
-                },
-              }
-            );
-            let api_key = userdata.api_key;
-            if ((await hit_api(api_key, 2)) == null) {
-              return res.status(400).send({ message: "Api_Hit tidak cukup" });
             }
-            return res.status(200).send({ message: "Berhasil Like Komentar " + id_comment.toUpperCase() });
-          } else {
-            return res.status(400).send({ message: "Komentar sudah pernah dilike" });
+          );
+          let api_key = temp.api_key;
+          if ((await hit_api(api_key, 2)) == null) {
+            return res.status(400).send({ message: "Api_Hit tidak cukup" });
           }
+          return res.status(200).send({ message: "Berhasil Like Komentar " + id_comment.toUpperCase() });
         } else {
-          return res.status(403).send({ message: "Can't Like. Comment milik user lain" });
+          return res.status(400).send({ message: "Komentar sudah pernah dilike" });
         }
       } else {
-        return res.status(404).send({ message: "Comment tidak ditemukan" });
+        return res.status(403).send({ message: "Can't Like. Comment milik user lain" });
       }
-    
+    } else {
+      return res.status(404).send({ message: "Comment tidak ditemukan" });
+    }
   }
   return res.status(401).send({ message: "Token tidak ditemukan" });
 };
@@ -680,47 +695,47 @@ const deleteComment = async (req, res) => {
     try {
       temp = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(401).send({message: "Token tidak valid"});
+      return res.status(401).send({ message: "Token tidak valid" });
     }
-    cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
+    cariUser = await users.findOne({ where: { api_key: temp.api_key } });
     if (!cariUser) {
       return res.status(401).send({ message: "Token tidak valid" });
     }
 
-      let getComm = await comments.findAll({
-        where: {
-          id_comment: id_comment,
-          status: 1,
-        },
-      });
-      if (getComm.length > 0) {
-        let idUser = temp.api_key;
-        if (await commentOwnedByUser(id_comment, idUser)) {
-          //delete comment
-          await comments.update(
-            {
-              status: 0,
+    let getComm = await comments.findAll({
+      where: {
+        id_comment: id_comment,
+        status: 1,
+      },
+    });
+    if (getComm.length > 0) {
+      let idUser = temp.api_key;
+      if (await commentOwnedByUser(id_comment, idUser)) {
+        //delete comment
+        await comments.update(
+          {
+            status: 0,
+          },
+          {
+            where: {
+              id_comment: id_comment,
             },
-            {
-              where: {
-                id_comment: id_comment,
-              },
-            }
-          );
-          //clear likes
-
-          let api_key = userdata.api_key;
-          if ((await hit_api(api_key, 2)) == null) {
-            return res.status(400).send({ message: "Api_Hit tidak cukup" });
           }
+        );
+        //clear likes
 
-          return res.status(200).send({ message: "Berhasil Menghapus Komentar " + id_comment.toUpperCase() });
-        } else {
-          return res.status(403).send({ message: "Can't delete. Comment milik user lain" });
+        let api_key = temp.api_key;
+        if ((await hit_api(api_key, 2)) == null) {
+          return res.status(400).send({ message: "Api_Hit tidak cukup" });
         }
+
+        return res.status(200).send({ message: "Berhasil Menghapus Komentar " + id_comment.toUpperCase() });
       } else {
-        return res.status(404).send({ message: "Comment tidak ditemukan" });
+        return res.status(403).send({ message: "Can't delete. Comment milik user lain" });
       }
+    } else {
+      return res.status(404).send({ message: "Comment tidak ditemukan" });
+    }
   }
   return res.status(401).send({ message: "Token tidak ditemukan" });
 };
@@ -742,60 +757,60 @@ const deleteCommentFromPost = async (req, res) => {
       return res.status(400).send({ message: error.message });
     }
 
-    let temp = "";
+    let userdata = "";
     let cariUser;
     try {
-      temp = jwt.verify(token, JWT_KEY);
+      userdata = jwt.verify(token, JWT_KEY);
     } catch (error) {
-      return res.status(401).send({message: "Token tidak valid"});
+      return res.status(401).send({ message: "Token tidak valid" });
     }
     cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
     if (!cariUser) {
       return res.status(401).send({ message: "Token tidak valid" });
     }
 
-      let cek = await posts.findOne({
-        where: {
-          id_post: id_post,
-        },
-      });
-      if (cek) {
-        //post ada
-        if (cek.api_key == temp.api_key) {
-          //benar pemilik dari post
-          let allComm = await comments.findAll({
+    let cek = await posts.findOne({
+      where: {
+        id_post: id_post,
+      },
+    });
+    if (cek) {
+      //post ada
+      if (cek.api_key == userdata.api_key) {
+        //benar pemilik dari post
+        let allComm = await comments.findAll({
+          where: {
+            id_post: id_post,
+            status: 1,
+          },
+        });
+        if (allComm.length == 0) {
+          return res.status(400).send({ message: "Belum Ada Komentar di Post " + id_post.toUpperCase() });
+        }
+
+        //delete all comment
+        await comments.update(
+          {
+            status: 0,
+          },
+          {
             where: {
               id_post: id_post,
-              status: 1,
             },
-          });
-          if (allComm.length == 0) {
-            return res.status(400).send({ message: "Belum Ada Komentar di Post " + id_post.toUpperCase() });
           }
-
-          //delete all comment
-          await comments.update(
-            {
-              status: 0,
-            },
-            {
-              where: {
-                id_post: id_post,
-              },
-            }
-          );
-          //clear likes
-          let api_key = userdata.api_key;
-          if ((await hit_api(api_key, 5)) == null) {
-            return res.status(400).send({ message: "Api_Hit tidak cukup" });
-          }
-          return res.status(200).send({ message: "Berhasil Menghapus Semua Komentar Dari Post " + id_post.toUpperCase() });
-        } else {
-          return res.status(403).send({ message: "Can't delete. Post milik user lain" });
+        );
+        //clear likes
+        let api_key = userdata.api_key;
+        if ((await hit_api(api_key, 5)) == null) {
+          return res.status(400).send({ message: "Api_Hit tidak cukup" });
         }
+        return res.status(200).send({ message: "Berhasil Menghapus Semua Komentar Dari Post " + id_post.toUpperCase() });
       } else {
-        return res.status(404).send({ message: "Post tidak ditemukan" });
+        return res.status(403).send({ message: "Can't delete. Post milik user lain" });
       }
+    } else {
+      return res.status(404).send({ message: "Post tidak ditemukan" });
+    }
   }
   return res.status(401).send({ message: "Token tidak ditemukan" });
 };
