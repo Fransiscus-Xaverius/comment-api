@@ -114,7 +114,7 @@ const addReply = async (req, res) => {
           await replies.create({ id_reply: id, id_comment: id_comment, username: userData.nama, api_key: cariUser.api_key, reply: result.data.clean });
           let temp = {
             username: userData.nama,
-            id_comment: id,
+            id_reply: id,
             comment: result.data.clean,
           };
           let jmlReplyAwal = parseInt(repliesCount[0].reply_count);
