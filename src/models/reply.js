@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Reply",
+      tableName: "replies",
       updatedAt: true,
       createdAt: false,
     }
