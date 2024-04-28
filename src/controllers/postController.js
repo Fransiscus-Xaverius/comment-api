@@ -77,9 +77,9 @@ const addPost = async (req, res) => {
       //let curHit = await hit_api(api_key, 5, res);
 
       //API Hit Charge
-      if ((await hit_api(api_key, 5)) == null) {
-        return res.status(400).send({ message: "Api_Hit tidak cukup" });
-      }
+      // if ((await hit_api(api_key, 5)) == null) {
+      //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+      // }
 
       return res.status(201).send({ message: "New Post successfully added", id_post: id });
     } else {
@@ -121,9 +121,9 @@ const getAllPost = async (req, res) => {
 
       //API Hit Charge
       let api_key = userdata.api_key;
-      if ((await hit_api(cariUser.api_key, 10)) == null) {
-        return res.status(400).send({ message: "Api_Hit tidak cukup" });
-      }
+      // if ((await hit_api(cariUser.api_key, 10)) == null) {
+      //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+      // }
 
       return res.status(200).send({
         username: cariUser.username,

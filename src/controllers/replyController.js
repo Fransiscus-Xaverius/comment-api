@@ -131,9 +131,9 @@ const addReply = async (req, res) => {
           );
           //API Hit Charge
           let api_key = userData.api_key;
-          if ((await hit_api(api_key, 2)) == null) {
-            return res.status(400).send({ message: "Api_Hit tidak cukup" });
-          }
+          // if ((await hit_api(api_key, 2)) == null) {
+          //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+          // }
           return res.status(201).send({ message: "Berhasil menambahkan reply", data: temp });
         }
       }
@@ -193,9 +193,9 @@ const editReply = async (req, res) => {
           };
           //API Hit Charge
           let api_key = userData.api_key;
-          if ((await hit_api(api_key, 2)) == null) {
-            return res.status(400).send({ message: "Api_Hit tidak cukup" });
-          }
+          // if ((await hit_api(api_key, 2)) == null) {
+          //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+          // }
           res.status(201).send({ message: "Berhasil update reply", data: data });
         }
       } catch (error) {
@@ -242,9 +242,9 @@ const deleteReply = async (req, res) => {
         await likes.destroy({ where: { jenis: 1, id_comment: id_reply } });
         //API Hit Charge
         let api_key = userData.api_key;
-        if ((await hit_api(api_key, 2)) == null) {
-          return res.status(400).send({ message: "Api_Hit tidak cukup" });
-        }
+        // if ((await hit_api(api_key, 2)) == null) {
+        //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+        // }
         return res.status(200).send({ message: "Berhasil menghapus reply" });
       } else res.status(404).send({ message: "Reply tidak ditemukan" });
     } catch (error) {
@@ -295,9 +295,9 @@ const deleteAllReply = async (req, res) => {
         //   await likes.destroy({ where: { jenis:1, id_comment:   } });
         //API Hit Charge
         let api_key = userData.api_key;
-        if ((await hit_api(api_key, 5)) == null) {
-          return res.status(400).send({ message: "Api_Hit tidak cukup" });
-        }
+        // if ((await hit_api(api_key, 5)) == null) {
+        //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+        // }
         return res.status(201).send({ message: "Semua reply di komen tersebut berhasil dihapus" });
       } else return res.status(404).send({ message: "Comment tidak ditemukan" });
     } catch (error) {
@@ -357,9 +357,9 @@ const likeReply = async (req, res) => {
           await likes.create({ id_like: id, id_comment: id_reply, id_post: ambil.id_post, username: username, jenis: 1 });
           //API Hit Charge
           let api_key = userData.api_key;
-          if ((await hit_api(api_key, 2)) == null) {
-            return res.status(400).send({ message: "Api_Hit tidak cukup" });
-          }
+          // if ((await hit_api(api_key, 2)) == null) {
+          //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+          // }
           res.status(201).send({ message: "Berhasil like reply " + id_reply.toUpperCase() });
         } else res.status(400).send({ message: "User sudah memberi like pada reply ini" });
       } else res.status(404).send({ message: "Reply tidak ditemukan" });

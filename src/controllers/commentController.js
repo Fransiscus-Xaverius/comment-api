@@ -221,9 +221,9 @@ const addComment = async (req, res) => {
       };
 
       //API Hit Charge
-      if ((await hit_api(api_key, 2)) == null) {
-        return res.status(400).send({ message: "Api_Hit tidak cukup" });
-      }
+      // if ((await hit_api(api_key, 2)) == null) {
+      //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+      // }
 
       return res.status(201).send({ message: " Berhasil menambahkan komentar", data: temp });
     } else {
@@ -295,9 +295,9 @@ const editComment = async (req, res) => {
     };
 
     //charge API Hit
-    if ((await hit_api(api_key, 2)) == null) {
-      return res.status(400).send({ message: "Api_Hit tidak cukup" });
-    }
+    // if ((await hit_api(api_key, 2)) == null) {
+    //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+    // }
 
     return res.status(200).send({ message: "Berhasil update comment", data: data });
   } else {
@@ -349,9 +349,9 @@ const getSpecificComment = async function (req, res) {
   }
 
   let api_key = userdata.api_key;
-  if ((await hit_api(api_key, 2)) == null) {
-    return res.status(400).send({ message: "Api_Hit tidak cukup" });
-  }
+  // if ((await hit_api(api_key, 2)) == null) {
+  //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+  // }
 
   return res.status(200).send({ comment: commentGet });
 };
@@ -399,9 +399,9 @@ const getAllCommentsFromPost = async (req, res) => {
     let foo = await getAllComments(id_post);
 
     //charge API hit
-    if ((await hit_api(api_key, 5)) == null) {
-      return res.status(400).send({ message: "Api_Hit tidak cukup" });
-    }
+    // if ((await hit_api(api_key, 5)) == null) {
+    //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+    // }
     console.log(foo.length);
     return res.status(200).send({ comments: foo });
   }
@@ -474,9 +474,9 @@ const getAllCommentFromPostWithSort = async function (req, res) {
   }
 
   //charge API Hit
-  if ((await hit_api(api_key, 5)) == null) {
-    return res.status(400).send({ message: "Api_Hit tidak cukup" });
-  }
+  // if ((await hit_api(api_key, 5)) == null) {
+  //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+  // }
 
   return res.status(200).send({ comments: sortedComment });
 };
@@ -561,10 +561,10 @@ const gifUpload = async function (req, res) {
 
     //charge API Hit
     let api_key = userdata.api_key;
-    if ((await hit_api(api_key, 5)) == null) {
-      fs.unlinkSync(`./uploads/${req.file.filename}`);
-      return res.status(400).send({ message: "Api_Hit tidak cukup" });
-    }
+    // if ((await hit_api(api_key, 5)) == null) {
+    //   fs.unlinkSync(`./uploads/${req.file.filename}`);
+    //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+    // }
 
     let urutan = parseInt(gif.length) + 1;
     if (err) {
@@ -657,9 +657,9 @@ const likeComment = async (req, res) => {
             }
           );
           let api_key = temp.api_key;
-          if ((await hit_api(api_key, 2)) == null) {
-            return res.status(400).send({ message: "Api_Hit tidak cukup" });
-          }
+          // if ((await hit_api(api_key, 2)) == null) {
+          //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+          // }
           return res.status(200).send({ message: "Berhasil Like Komentar " + id_comment.toUpperCase() });
         } else {
           return res.status(400).send({ message: "Komentar sudah pernah dilike" });
@@ -726,9 +726,9 @@ const deleteComment = async (req, res) => {
         //clear likes
 
         let api_key = temp.api_key;
-        if ((await hit_api(api_key, 2)) == null) {
-          return res.status(400).send({ message: "Api_Hit tidak cukup" });
-        }
+        // if ((await hit_api(api_key, 2)) == null) {
+        //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+        // }
 
         return res.status(200).send({ message: "Berhasil Menghapus Komentar " + id_comment.toUpperCase() });
       } else {
@@ -802,9 +802,9 @@ const deleteCommentFromPost = async (req, res) => {
         );
         //clear likes
         let api_key = userdata.api_key;
-        if ((await hit_api(api_key, 5)) == null) {
-          return res.status(400).send({ message: "Api_Hit tidak cukup" });
-        }
+        // if ((await hit_api(api_key, 5)) == null) {
+        //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
+        // }
         return res.status(200).send({ message: "Berhasil Menghapus Semua Komentar Dari Post " + id_post.toUpperCase() });
       } else {
         return res.status(403).send({ message: "Can't delete. Post milik user lain" });
