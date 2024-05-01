@@ -6,6 +6,7 @@ const sequelize = new Sequelize(development.database, development.username, deve
   port: 3306,
   dialect: "mysql",
 });
+const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 let JWT_KEY = process.env.JWT_KEY;
 
