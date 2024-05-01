@@ -10,6 +10,23 @@ module.exports = {
       api_key: {
         type: Sequelize.STRING,
       },
+      title: {
+        type: Sequelize.STRING,
+      },
+      author: {
+        type: Sequelize.STRING,
+      },
+      content: {
+        type: Sequelize.STRING,
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
