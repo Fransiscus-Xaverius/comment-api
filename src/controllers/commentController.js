@@ -550,13 +550,13 @@ const gifUpload = async function (req, res) {
     let gif2;
     if (commentGet.gif_reaction) {
       try {
-        gif2 = JSON.parse(commentGet.gif_reaction);
+        gif2 = JSON.parse(JSON.stringify(commentGet.gif_reaction));
       } catch (error) {
         console.error('Error parsing JSON:', error);
+        console.log(commentGet.gif_reaction);
         return res.status(400).send({ message: "Error parsing JSON" });
       }
     }
-
 
     for (let i = 0; i < gif2.length; i++) {
       gif.push(gif2[i]);
