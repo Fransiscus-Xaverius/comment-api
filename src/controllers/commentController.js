@@ -547,13 +547,12 @@ const gifUpload = async function (req, res) {
       fs.unlinkSync(`./uploads/${req.file.filename}`);
       return res.status(404).send({ message: "Comment tidak ditemukan" });
     }
-    let gif2 = [];
+    let gif2;
     if (commentGet.gif_reaction) {
       try {
         gif2 = JSON.parse(commentGet.gif_reaction);
       } catch (error) {
         console.error('Error parsing JSON:', error);
-        console.log(commentGet.gif_reaction);
         return res.status(400).send({ message: "Error parsing JSON" });
       }
     }
