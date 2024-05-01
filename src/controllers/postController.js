@@ -95,7 +95,7 @@ const addPost = async (req, res) => {
       
       let title = req.body.title;
       let content = req.body.content;
-      let authorName = cariUser.username;
+      let authorName = cariUser.nama;
 
       //create new post with ORM
       await posts.create({ id_post: id, api_key: api_key, title: title, author: authorName, content: content});
