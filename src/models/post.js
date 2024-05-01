@@ -20,12 +20,21 @@ module.exports = (sequelize, DataTypes) => {
       api_key: {
         type: DataTypes.STRING,
       },
+      title:{
+        type: DataTypes.STRING
+      },
+      author:{
+        type: DataTypes.STRING
+      },
+      content:{
+        type: DataTypes.STRING
+      },
     },
     {
       sequelize,
       modelName: "post",
       tableName: "posts",
-      timestamps: false,
+      timestamps: true,
     }
   );
   return post;

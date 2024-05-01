@@ -42,8 +42,8 @@ async function getPost(id_post) {
 }
 
 async function isUserPost(api_key, id_post) {
-  let fuckthisshit = await getPost(id_post);
-  return fuckthisshit == api_key;
+  let userPost = await getPost(id_post);
+  return userPost == api_key;
 }
 //=========================================================
 
@@ -71,8 +71,33 @@ const addPost = async (req, res) => {
       let id = await generatePostID();
       //get API key from token
       let api_key = userdata.api_key;
+
+      //validate body params with schema
+      let schema = Joi.object({
+        title: Joi.string().required().messages({
+          "any.required": "Semua Field Harus Diisi",
+          "string.empty": "Isi Field Tidak Boleh String Kosong",
+        }),
+        content: Joi.string().required().messages({
+          "any.required": "Semua Field Harus Diisi",
+          "string.empty": "Isi Field Tidak Boleh String Kosong"
+        }),
+      });
+
+      try {
+        await schema.validateAsync(req.body);
+      } catch (error) {
+        return res.status(400).send({
+          message: error.message,
+        });
+      }
+      
+      let title = req.body.title;
+      let content = req.body.content;
+      let authorName = cariUser.username;
+
       //create new post with ORM
-      await posts.create({ id_post: id, api_key: api_key });
+      await posts.create({ id_post: id, api_key: api_key, title: title, author: authorName, content: content});
 
       //let curHit = await hit_api(api_key, 5, res);
 
