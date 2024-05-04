@@ -35,7 +35,7 @@ const { addPost, getAllPost, getPostById } = require("../controllers/postControl
 
 router.get("/post/:id", getPostById);
 router.post("/post", addPost);
-router.get("/post/all", getAllPost);
+router.get("/posts", getAllPost);
 router.get("/post/comments", getAllCommentsFromPost);
 router.get("/post/sortComment", getAllCommentFromPostWithSort);
 router.delete("/post/comments", deleteCommentFromPost);
