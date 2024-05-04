@@ -117,7 +117,8 @@ const addPost = async (req, res) => {
 
 //get all post from user (Unchecked) (Hit : 10)
 const getAllPost = async (req, res) => {
-  let token = req.header("x-auth-token");
+  // let token = req.header("x-auth-token");
+  let token = true; //bypass token for integration with KitaSetara. -Frans
   if (token) {
     let userdata = "";
     let cariUser;
@@ -165,4 +166,25 @@ const getAllPost = async (req, res) => {
   } else res.status(401).send({ message: "Token tidak ditemukan" });
 };
 
-module.exports = { addPost, getAllPost, isUserPost };
+const getPostById = async (req, res) => {
+  let id = req.params.id;
+  const schema = Joi.object({
+    id: Joi.string().required().messages({
+      "any.required": "Semua Field Harus Diisi",
+      "string.empty": "Isi Field Tidak Boleh String Kosong",
+    }),
+  });
+  try {
+    await schema.validateAsync(req.params);
+  } catch (error) {
+    return res.status(400).send({ message: error.message });
+  }
+  let postGet = await posts.findOne({ where: { id_post: id } });
+  if (postGet) {
+    return res.status(200).send(postGet);
+  } else {
+    return res.status(404).send({ message: "Post not found" });
+  }
+};
+
+module.exports = { addPost, getAllPost, isUserPost, getPostById };

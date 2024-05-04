@@ -31,8 +31,9 @@ router.delete("/reply/deleteAll", deleteAllReply);
 router.post("/reply/like", likeReply);
 
 //posts endpoints
-const { addPost, getAllPost } = require("../controllers/postController");
+const { addPost, getAllPost, getPostById } = require("../controllers/postController");
 
+router.get("/post/:id", getPostById);
 router.post("/post", addPost);
 router.get("/post/all", getAllPost);
 router.get("/post/comments", getAllCommentsFromPost);
