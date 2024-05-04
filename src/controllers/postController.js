@@ -144,7 +144,7 @@ const getAllPost = async (req, res) => {
     if (allPosts) {
       for (let index = 0; index < allPosts.length; index++) {
         const element = allPosts[index];
-        foo.push(element.id_post);
+        foo.push(element);
       }
 
       //API Hit Charge, disabled for integration into KitaSetara. -Frans
