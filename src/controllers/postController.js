@@ -153,11 +153,13 @@ const getAllPost = async (req, res) => {
       //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
       // }
 
-      return res.status(200).send({
+      return res.status(200).send(//{
         // username: cariUser.username,
         // api_key: cariUser.api_key,
-        Posts: foo,
-      });
+        //Posts: foo,
+      //}
+        foo
+      );
     }
     //safeguard incase of database error/deleted user with valid token
     return res.status(400).send({
