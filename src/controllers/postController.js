@@ -121,7 +121,7 @@ const getAllPost = async (req, res) => {
   // let token = true; //bypass token for integration with KitaSetara. -Frans
   // if (token) {
     let userdata = "";
-    let cariUser;
+    // let cariUser;
     // try {
     //   userdata = jwt.verify(token, JWT_KEY);
     // } catch (error) {
@@ -154,8 +154,8 @@ const getAllPost = async (req, res) => {
       // }
 
       return res.status(200).send({
-        username: cariUser.username,
-        api_key: cariUser.api_key,
+        // username: cariUser.username,
+        // api_key: cariUser.api_key,
         Posts: foo,
       });
     }
