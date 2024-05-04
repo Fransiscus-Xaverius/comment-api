@@ -118,8 +118,8 @@ const addPost = async (req, res) => {
 //get all post from user (Unchecked) (Hit : 10)
 const getAllPost = async (req, res) => {
   // let token = req.header("x-auth-token");
-  let token = true; //bypass token for integration with KitaSetara. -Frans
-  if (token) {
+  // let token = true; //bypass token for integration with KitaSetara. -Frans
+  // if (token) {
     let userdata = "";
     let cariUser;
     try {
@@ -163,7 +163,7 @@ const getAllPost = async (req, res) => {
     return res.status(400).send({
       message: "Oops, something went wrong.",
     });
-  } else res.status(401).send({ message: "Token tidak ditemukan" });
+  // } else res.status(401).send({ message: "Token tidak ditemukan" });
 };
 
 const getPostById = async (req, res) => {
