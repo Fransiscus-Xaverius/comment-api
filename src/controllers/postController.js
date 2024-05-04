@@ -132,9 +132,10 @@ const getAllPost = async (req, res) => {
     }
 
     let allPosts = await posts.findAll({
-      where: {
-        api_key: cariUser.api_key,
-      },
+      // disabled for integration with KitaSetara. -Frans
+      // where: {
+      //   api_key: cariUser.api_key,
+      // },
     });
 
     let foo = [];
@@ -145,7 +146,7 @@ const getAllPost = async (req, res) => {
         foo.push(element.id_post);
       }
 
-      //API Hit Charge
+      //API Hit Charge, disabled for integration into KitaSetara. -Frans
       let api_key = userdata.api_key;
       // if ((await hit_api(cariUser.api_key, 10)) == null) {
       //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
