@@ -122,15 +122,15 @@ const getAllPost = async (req, res) => {
   // if (token) {
     let userdata = "";
     let cariUser;
-    try {
-      userdata = jwt.verify(token, JWT_KEY);
-    } catch (error) {
-      return res.status(401).send({ message: "Token tidak valid" });
-    }
-    cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
-    if (!cariUser) {
-      return res.status(401).send({ message: "Token tidak valid" });
-    }
+    // try {
+    //   userdata = jwt.verify(token, JWT_KEY);
+    // } catch (error) {
+    //   return res.status(401).send({ message: "Token tidak valid" });
+    // }
+    // cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
+    // if (!cariUser) {
+    //   return res.status(401).send({ message: "Token tidak valid" });
+    // }
 
     let allPosts = await posts.findAll({
       // disabled for integration with KitaSetara. -Frans
