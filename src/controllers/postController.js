@@ -13,6 +13,7 @@ let JWT_KEY = process.env.JWT_KEY;
 //models
 const users = require("../models/user")(sequelize, DataTypes);
 const posts = require("../models/post")(sequelize, DataTypes);
+const comments = require("../models/comment")(sequelize, DataTypes);
 
 //module imports
 const { hit_api } = require("../controllers/userController");
