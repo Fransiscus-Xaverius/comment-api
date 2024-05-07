@@ -829,4 +829,4 @@ const deleteCommentFromPost = async (req, res) => {
 };
 
 
-module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, getAllCommentFromPostWithSort, gifUpload, likeComment, deleteComment, deleteCommentFromPost, generateLikeID, getLastComment };
+module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, getAllCommentFromPostWithSort, gifUpload, likeComment, deleteComment, deleteCommentFromPost, generateLikeID};
