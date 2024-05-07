@@ -215,8 +215,8 @@ const addComment = async (req, res) => {
     let result = await axios.request(config);
     if (result) {
       let id = await generateCommentID();
-      await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: cariUser.api_key, like_count: 0, id_post: id_post });
-
+      // await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: cariUser.api_key, like_count: 0, id_post: id_post });
+      await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: "", like_count: 0, id_post: id_post });
       let temp = {
         username: username,
         id_comment: id,
