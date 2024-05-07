@@ -150,8 +150,7 @@ const getAllPost = async (req, res) => {
     let foo = [];
 
     if (allPosts) {
-      for (let index = 0; index < allPosts.length; index++) {
-        let element = allPosts[index];
+      foo = await Promise.all(allPosts.map(async (element) => {
         const lastComment = await comments.findOne({
           where: {
             id_post: element.id_post,
@@ -160,8 +159,8 @@ const getAllPost = async (req, res) => {
           order: [["id_comment", "DESC"]],
         });
         element.lastComment = lastComment;
-        foo.push(element);
-      }
+        return element;
+      }));
 
       //API Hit Charge, disabled for integration into KitaSetara. -Frans
       let api_key = userdata.api_key;
