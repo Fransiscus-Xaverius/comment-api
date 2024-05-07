@@ -151,14 +151,15 @@ const getAllPost = async (req, res) => {
 
     if (allPosts) {
       for (let index = 0; index < allPosts.length; index++) {
-        const element = allPosts[index];
-        element.lastComment = await comments.findOne({
+        let element = allPosts[index];
+        const lastComment = await comments.findOne({
           where: {
             id_post: element.id_post,
             status: 1,
           },
           order: [["id_comment", "DESC"]],
         });
+        element.lastComment = lastComment;
         foo.push(element);
       }
 
