@@ -163,24 +163,27 @@ async function profanityFilter(comment) {
 
 //add comment endpoint(CHECK PLS) (Hit : 2)
 const addComment = async (req, res) => {
-  let token = req.header("x-auth-token");
-  if (token) {
-    let userdata = "";
-    let cariUser;
-    try {
-      userdata = jwt.verify(token, JWT_KEY);
-    } catch (error) {
-      return res.status(401).send({ message: "Token tidak valid" });
-    }
-    cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
-    if (!cariUser) {
-      return res.status(401).send({ message: "Token tidak valid" });
-    }
+  //Disabled for Integration with KitaSetara App
+  // let token = req.header("x-auth-token");
+  // if (token) {
+  //   let userdata = "";
+  //   let cariUser;
+  //   try {
+  //     userdata = jwt.verify(token, JWT_KEY);
+  //   } catch (error) {
+  //     return res.status(401).send({ message: "Token tidak valid" });
+  //   }
+  //   cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
+  //   if (!cariUser) {
+  //     return res.status(401).send({ message: "Token tidak valid" });
+  //   }
 
-    let username = userdata.nama;
-    let api_key = userdata.api_key;
     let schema = Joi.object({
       id_post: Joi.string().required().messages({
+        "any.required": "Semua Field Harus Diisi",
+        "string.empty": "Isi Field Tidak Boleh String Kosong",
+      }),
+      username: Joi.string().required().messages({
         "any.required": "Semua Field Harus Diisi",
         "string.empty": "Isi Field Tidak Boleh String Kosong",
       }),
@@ -198,16 +201,16 @@ const addComment = async (req, res) => {
         message: error.message,
       });
     }
-
+    let username = req.body.username;
     let comment = req.body.comment;
     let id_post = req.body.id_post;
     let postGet = await posts.findAll({ where: { id_post: id_post } });
     if (postGet.length == 0) {
       return res.status(404).send({ message: "Post tidak ditemukan" });
     }
-    let isuserpost = await isUserPost(api_key, id_post);
-    console.log(api_key);
-    if (!isuserpost) return res.status(403).send({ message: "Unauthorized Access, post milik user lain" });
+    // let isuserpost = await isUserPost(api_key, id_post);
+    // console.log(api_key);
+    // if (!isuserpost) return res.status(403).send({ message: "Unauthorized Access, post milik user lain" });
     const config = await profanityFilter(comment);
     let result = await axios.request(config);
     if (result) {
@@ -229,9 +232,9 @@ const addComment = async (req, res) => {
     } else {
       return res.status(400).send({ message: "3rd party API is Down" });
     }
-  } else {
-    return res.status(401).send({ message: "Token tidak ditemukan" });
-  }
+  // } else {
+  //   return res.status(401).send({ message: "Token tidak ditemukan" });
+  // }
 };
 
 //edit comment endpoint (Hit : 2)
@@ -358,21 +361,21 @@ const getSpecificComment = async function (req, res) {
 
 //get all comments from post endpoint (Hit : 5)
 const getAllCommentsFromPost = async (req, res) => {
-  let token = req.header("x-auth-token");
-  if (token) {
-    let userdata = "";
-    let cariUser;
-    try {
-      userdata = jwt.verify(token, JWT_KEY);
-    } catch (error) {
-      return res.status(401).send({ message: "Token tidak valid" });
-    }
-    cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
-    if (!cariUser) {
-      return res.status(401).send({ message: "Token tidak valid" });
-    }
+  // let token = req.header("x-auth-token");
+  // if (token) {
+    // let userdata = "";
+    // let cariUser;
+    // try {
+    //   userdata = jwt.verify(token, JWT_KEY);
+    // } catch (error) {
+    //   return res.status(401).send({ message: "Token tidak valid" });
+    // }
+    // cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
+    // if (!cariUser) {
+    //   return res.status(401).send({ message: "Token tidak valid" });
+    // }
 
-    let api_key = userdata.api_key;
+    // let api_key = userdata.api_key;
 
     let schema = Joi.object({
       id_post: Joi.string().required().messages({
@@ -392,9 +395,9 @@ const getAllCommentsFromPost = async (req, res) => {
     if (!postGet) {
       return res.status(404).send({ message: "Post tidak ditemukan" });
     }
-    let isuserpost = await isUserPost(api_key, id_post);
-    console.log(api_key);
-    if (!isuserpost) return res.status(403).send({ message: "Unauthorized Access, post milik user lain" });
+    // let isuserpost = await isUserPost(api_key, id_post);
+    // console.log(api_key);
+    // if (!isuserpost) return res.status(403).send({ message: "Unauthorized Access, post milik user lain" });
 
     let foo = await getAllComments(id_post);
 
@@ -404,8 +407,8 @@ const getAllCommentsFromPost = async (req, res) => {
     // }
     console.log(foo.length);
     return res.status(200).send({ comments: foo });
-  }
-  return res.status(401).send({ message: "Token tidak ditemukan" });
+  // }
+  // return res.status(401).send({ message: "Token tidak ditemukan" });
 };
 
 // endpoint sort comment (Hit : 5)
