@@ -16,7 +16,6 @@ const posts = require("../models/post")(sequelize, DataTypes);
 
 //module imports
 const { hit_api } = require("../controllers/userController");
-const {getLastComment} = require("../controllers/commentController");
 
 //===================HELPER FUNCTIONS======================
 //generate new post functions
