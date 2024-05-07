@@ -16,6 +16,7 @@ const posts = require("../models/post")(sequelize, DataTypes);
 
 //module imports
 const { hit_api } = require("../controllers/userController");
+const {getLastComment} = require("../controllers/commentController");
 
 //===================HELPER FUNCTIONS======================
 //generate new post functions
@@ -151,6 +152,7 @@ const getAllPost = async (req, res) => {
     if (allPosts) {
       for (let index = 0; index < allPosts.length; index++) {
         const element = allPosts[index];
+        element.lastComment = await getLastComment(element.id_post);
         foo.push(element);
       }
 
