@@ -53,25 +53,25 @@ async function isUserPost(api_key, id_post) {
 //add post endpoint (Hit : 5)
 const addPost = async (req, res) => {
   // console.log(JWT_KEY);
-  let token = req.header("x-auth-token");
-  if (token) {
-    let userdata = "";
-    let cariUser;
-    try {
-      userdata = jwt.verify(token, JWT_KEY);
-    } catch (error) {
-      return res.status(401).send({ message: "Token tidak valid" });
-      // return res.send({ message: error.toString() });
-    }
-    //Search for current user who's registering a new post.
-    cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
-    //if current user exists, make post and return id_post
+  // let token = req.header("x-auth-token");
+  // if (token) {
+  //   let userdata = "";
+  //   let cariUser;
+  //   try {
+  //     userdata = jwt.verify(token, JWT_KEY);
+  //   } catch (error) {
+  //     return res.status(401).send({ message: "Token tidak valid" });
+  //     // return res.send({ message: error.toString() });
+  //   }
+  //   //Search for current user who's registering a new post.
+  //   cariUser = await users.findOne({ where: { api_key: userdata.api_key } });
+  //   //if current user exists, make post and return id_post
 
-    if (cariUser) {
+  //   if (cariUser) {
       //generate post ID
       let id = await generatePostID();
       //get API key from token
-      let api_key = userdata.api_key;
+      // let api_key = userdata.api_key;
 
       //validate body params with schema
       let schema = Joi.object({
@@ -82,6 +82,10 @@ const addPost = async (req, res) => {
         content: Joi.string().required().messages({
           "any.required": "Semua Field Harus Diisi",
           "string.empty": "Isi Field Tidak Boleh String Kosong"
+        }),
+        authorName: Joi.string().required().messages({
+          "any.required": "Semua Field Harus Diisi",
+          "string.empty": "Isi Field Tidak Boleh String Kosong",
         }),
       });
 
@@ -95,10 +99,13 @@ const addPost = async (req, res) => {
       
       let title = req.body.title;
       let content = req.body.content;
-      let authorName = cariUser.nama;
+      // let authorName = cariUser.nama;
+      let authorName = req.body.authorName;
 
       //create new post with ORM
-      await posts.create({ id_post: id, api_key: api_key, title: title, author: authorName, content: content});
+      // await posts.create({ id_post: id, api_key: api_key, title: title, author: authorName, content: content});
+
+      await posts.create({ id_post: id, api_key:"", title: title, author: authorName, content: content}); //for intergration with KitaSetara.
 
       //let curHit = await hit_api(api_key, 5, res);
 
@@ -108,11 +115,11 @@ const addPost = async (req, res) => {
       // }
 
       return res.status(201).send({ message: "New Post successfully added", id_post: id });
-    } else {
-      //Unreachable statement, but here just in case a user is deleted but the token is still active.
-      return res.status(401).send({ message: "Token tidak valid" });
-    }
-  } else res.status(401).send({ message: "Token tidak ditemukan" });
+  //   } else {
+  //     //Unreachable statement, but here just in case a user is deleted but the token is still active.
+  //     return res.status(401).send({ message: "Token tidak valid" });
+  //   }
+  // } else res.status(401).send({ message: "Token tidak ditemukan" });
 };
 
 //get all post from user (Unchecked) (Hit : 10)
