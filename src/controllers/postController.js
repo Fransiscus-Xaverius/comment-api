@@ -158,6 +158,8 @@ const getAllPost = async (req, res) => {
           },
           order: [["id_comment", "DESC"]],
         });
+        console.log('lastComment:', lastComment);  // Add this line
+        element = element.toJSON();
         element.lastComment = lastComment;
         return element;
       }));
