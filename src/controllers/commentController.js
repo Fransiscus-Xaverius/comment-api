@@ -828,15 +828,5 @@ const deleteCommentFromPost = async (req, res) => {
   return res.status(401).send({ message: "Token tidak ditemukan" });
 };
 
-const getLastComment = async (id_post) => {
-  let lastComment = await comments.findOne({
-    where: {
-      id_post: id_post,
-      status: 1,
-    },
-    order: [["id_comment", "DESC"]],
-  });
-  return lastComment;
-};
 
 module.exports = { addComment, editComment, getAllCommentsFromPost, getSpecificComment, getAllCommentFromPostWithSort, gifUpload, likeComment, deleteComment, deleteCommentFromPost, generateLikeID, getLastComment };
