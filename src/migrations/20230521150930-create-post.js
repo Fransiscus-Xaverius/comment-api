@@ -7,7 +7,10 @@ module.exports = {
         type: Sequelize.STRING,
         primaryKey: true,
       },
-      api_key: {
+      // api_key: { //this is disabled due to Integration with KitaSetara. -Uncomment this and comment on UID.
+      //   type: Sequelize.STRING,
+      // },
+      uid:{
         type: Sequelize.STRING,
       },
       title: {
