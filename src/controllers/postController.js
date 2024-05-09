@@ -106,11 +106,12 @@ const addPost = async (req, res) => {
       let content = req.body.content;
       // let authorName = cariUser.nama;
       let authorName = req.body.authorName;
+      let uid = req.body.uid;
 
       //create new post with ORM
       // await posts.create({ id_post: id, api_key: api_key, title: title, author: authorName, content: content});
 
-      await posts.create({ id_post: id, api_key:"", title: title, author: authorName, content: content}); //for intergration with KitaSetara.
+      await posts.create({ id_post: id, uid:uid , title: title, author: authorName, content: content}); //for intergration with KitaSetara.
 
       //let curHit = await hit_api(api_key, 5, res);
 
