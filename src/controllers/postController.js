@@ -88,6 +88,10 @@ const addPost = async (req, res) => {
           "any.required": "Semua Field Harus Diisi",
           "string.empty": "Isi Field Tidak Boleh String Kosong",
         }),
+        uid: Joi.string().required().messages({
+          "any.required": "Semua Field Harus Diisi",
+          "string.empty": "Isi Field Tidak Boleh String Kosong",
+        }),
       });
 
       try {

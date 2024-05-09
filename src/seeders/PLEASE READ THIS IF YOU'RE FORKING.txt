@@ -1,0 +1,1 @@
+Db Seeds aren't usable at this point due to integration with KitaSetara App. If you want to use this, please uncomment every thing that is marked with "Integration with KitaSetara" -Frans

@@ -17,7 +17,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         primaryKey: true,
       },
-      api_key: {
+      //this is usable, but it is commented due to integration with KitaSetara App. -Frans
+      // api_key: {
+      //   type: DataTypes.STRING,
+      // },
+      uid: { //this is only for KitaSetara App integration, feel free to comment this when you're forking this. Use api_key instead. -Frans
         type: DataTypes.STRING,
       },
       title:{
