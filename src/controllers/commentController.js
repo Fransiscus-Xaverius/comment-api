@@ -378,7 +378,7 @@ const getAllCommentsFromPost = async (req, res) => {
     // let api_key = userdata.api_key;
 
     let schema = Joi.object({
-      id_post: Joi.string().required().messages({
+      id: Joi.string().required().messages({
         "any.required": "Semua Field Harus Diisi",
         "string.empty": "Isi Field Tidak Boleh String Kosong",
       }),
@@ -390,7 +390,7 @@ const getAllCommentsFromPost = async (req, res) => {
       return res.status(400).send({ message: error.message });
     }
 
-    let id_post = req.params.id_post;
+    let id_post = req.params.id;
     let postGet = await posts.findOne({ where: { id_post: id_post } });
     if (!postGet) {
       return res.status(404).send({ message: "Post tidak ditemukan" });
