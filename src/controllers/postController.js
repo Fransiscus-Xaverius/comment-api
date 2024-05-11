@@ -120,7 +120,7 @@ const addPost = async (req, res) => {
       //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
       // }
 
-      return res.status(201).send({ message: "New Post successfully added", id: id });
+      return res.status(201).send({ message: "New Post successfully added", id_post: id });
   //   } else {
   //     //Unreachable statement, but here just in case a user is deleted but the token is still active.
   //     return res.status(401).send({ message: "Token tidak valid" });
