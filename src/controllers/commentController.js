@@ -406,7 +406,7 @@ const getAllCommentsFromPost = async (req, res) => {
     //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
     // }
     console.log(foo.length);
-    return res.status(200).send({ comments: foo });
+    return res.status(200).send(foo);
   // }
   // return res.status(401).send({ message: "Token tidak ditemukan" });
 };
