@@ -223,7 +223,7 @@ const addComment = async (req, res) => {
       //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
       // }
 
-      return res.status(201).send({ message: " Berhasil menambahkan komentar", data: temp });
+      return res.status(201).send(temp);
     } else {
       return res.status(400).send({ message: "3rd party API is Down" });
     }
