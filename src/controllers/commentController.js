@@ -216,19 +216,14 @@ const addComment = async (req, res) => {
     if (result) {
       let id = await generateCommentID();
       // await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: cariUser.api_key, like_count: 0, id_post: id_post });
-      await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: "", like_count: 0, id_post: id_post });
-      let temp = {
-        username: username,
-        id_comment: id,
-        comment: result.data.clean,
-      };
+      let result = await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: "", like_count: 0, id_post: id_post });
 
       //API Hit Charge
       // if ((await hit_api(api_key, 2)) == null) {
       //   return res.status(400).send({ message: "Api_Hit tidak cukup" });
       // }
 
-      return res.status(201).send({ message: " Berhasil menambahkan komentar", data: temp });
+      return res.status(201).send({ message: " Berhasil menambahkan komentar", data: result });
     } else {
       return res.status(400).send({ message: "3rd party API is Down" });
     }
