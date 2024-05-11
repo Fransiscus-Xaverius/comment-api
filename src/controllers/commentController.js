@@ -385,12 +385,12 @@ const getAllCommentsFromPost = async (req, res) => {
     });
 
     try {
-      await schema.validateAsync(req.body);
+      await schema.validateAsync(req.params);
     } catch (error) {
       return res.status(400).send({ message: error.message });
     }
 
-    let id_post = req.body.id_post;
+    let id_post = req.params.id_post;
     let postGet = await posts.findOne({ where: { id_post: id_post } });
     if (!postGet) {
       return res.status(404).send({ message: "Post tidak ditemukan" });
