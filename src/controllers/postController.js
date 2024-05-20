@@ -163,8 +163,15 @@ const getAllPost = async (req, res) => {
           },
           order: [["id_comment", "DESC"]],
         });
+        const amountOfComments = await comments.count({
+          where: {
+            id_post: element.id_post,
+            status: 1,
+          },
+        });
         console.log('lastComment:', lastComment);  // Add this line
         element = element.toJSON();
+        element.amountOfComments = amountOfComments;
         element.lastComment = lastComment;
         return element;
       }));
