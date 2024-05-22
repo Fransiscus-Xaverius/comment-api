@@ -201,6 +201,7 @@ const addComment = async (req, res) => {
     try {
       await schema.validateAsync(req.body);
     } catch (error) {
+      console.log('error validating message');
       return res.status(400).send({
         message: error.message,
       });
