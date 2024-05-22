@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      author: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       comment: DataTypes.STRING,
       api_key: DataTypes.STRING,
       like_count: DataTypes.INTEGER,

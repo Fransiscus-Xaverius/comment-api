@@ -187,6 +187,10 @@ const addComment = async (req, res) => {
         "any.required": "Semua Field Harus Diisi",
         "string.empty": "Isi Field Tidak Boleh String Kosong",
       }),
+      authorName: Joi.string().required().messages({
+        "any.required": "Semua Field Harus Diisi",
+        "string.empty": "Isi Field Tidak Boleh String Kosong",
+      }),
       comment: Joi.string().required().messages({
         "any.required": "Semua Field Harus Diisi",
         "string.empty": "Isi Field Tidak Boleh String Kosong",
@@ -216,7 +220,7 @@ const addComment = async (req, res) => {
     if (result) {
       let id = await generateCommentID();
       // await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: cariUser.api_key, like_count: 0, id_post: id_post });
-      let temp = await comments.create({ id_comment: id, username: username, comment: result.data.clean, api_key: "", like_count: 0, id_post: id_post });
+      let temp = await comments.create({ id_comment: id, username: username, author: req.body.authorName, comment: result.data.clean, api_key: "", like_count: 0, id_post: id_post });
 
       //API Hit Charge
       // if ((await hit_api(api_key, 2)) == null) {

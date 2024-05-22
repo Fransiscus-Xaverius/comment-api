@@ -15,6 +15,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      author: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       comment: {
         type: Sequelize.STRING,
       },
